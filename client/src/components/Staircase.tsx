@@ -27,12 +27,13 @@ const stepsData: StepContent[] = [
     shortDesc: "Claridad y metas",
     icon: Brain,
     whatToDo: [
-      "Define tus 'must-haves' vs. 'nice-to-haves'.",
-      "Alinea expectativas con tu familia o pareja.",
-      "Calcula tu presupuesto mensual ideal (sin agobiarte)."
+      "Analizas por qué quieres comprar (¿es por espacio, inversión o independencia?)",
+      "Distingues entre lo que realmente necesitas (como número de cuartos) y lo que te gustaría tener (como una piscina).",
+      "Conversas con tu familia para asegurar que todos tienen la misma meta.",
+      "Revisas tus finanzas personales para saber cuánto puedes pagar cómodamente cada mes."
     ],
     toAdvance: [
-      "Tener claras tus 3 prioridades no negociables."
+      "Tener una lista escrita de tus 3 prioridades no negociables."
     ],
     realtorValue: "Lianet te ayuda a traducir tus deseos en un plan realista, filtrando lo que el mercado realmente ofrece en tu zona.",
     gptAgentId: "decision-gpt"
@@ -43,9 +44,10 @@ const stepsData: StepContent[] = [
     shortDesc: "Salud financiera",
     icon: CreditCard,
     whatToDo: [
-      "Revisa tu puntaje de crédito y corrige errores.",
-      "Suma tus ahorros para el enganche y gastos de cierre.",
-      "Junta tus documentos (nóminas, estados de cuenta)."
+      "Revisas tu historial de crédito para asegurarte de que no haya errores.",
+      "Calculas cuánto dinero tienes ahorrado para el pago inicial y los gastos de cierre.",
+      "Reúnes tus documentos importantes: recibos de nómina, estados de cuenta y declaraciones de impuestos.",
+      "Determinas cuánto es lo máximo que quieres pagar, no solo lo que el banco te prestaría."
     ],
     toAdvance: [
       "Conocer tu capacidad de compra real."
@@ -59,9 +61,10 @@ const stepsData: StepContent[] = [
     shortDesc: "Presupuesto real",
     icon: Landmark,
     whatToDo: [
-      "Compara opciones de préstamo con varios bancos.",
-      "Elige al prestamista que te explique mejor, no solo el más barato.",
-      "Obtén tu carta de pre-aprobación oficial."
+      "Contactas a varios prestamistas para comparar tasas y costos.",
+      "Entregas tu documentación financiera para que evalúen tu perfil.",
+      "Recibes una carta oficial que dice cuánto dinero te pueden prestar.",
+      "Entiendes claramente cuál sería tu pago mensual total (incluyendo impuestos y seguros)."
     ],
     toAdvance: [
       "Tener la carta de pre-aprobación en mano."
@@ -75,9 +78,10 @@ const stepsData: StepContent[] = [
     shortDesc: "Plan de mercado",
     icon: Compass,
     whatToDo: [
-      "Selecciona las zonas que se ajustan a tu vida y presupuesto.",
-      "Define el tipo de propiedad (casa, condo, townhome).",
-      "Establece tiempos: ¿cuándo necesitas mudarte?"
+      "Decides en qué zonas te gustaría vivir basándote en precios, escuelas y transporte.",
+      "Defines si buscas una casa unifamiliar, un apartamento o una casa adosada.",
+      "Estableces un calendario realista: ¿cuándo necesitas mudarte?",
+      "Te preparas mentalmente para el ritmo del mercado actual."
     ],
     toAdvance: [
       "Tener un calendario de visitas y alertas activas."
@@ -91,9 +95,10 @@ const stepsData: StepContent[] = [
     shortDesc: "Visitas inteligentes",
     icon: Home,
     whatToDo: [
-      "Visita propiedades filtradas por calidad, no cantidad.",
-      "Mira más allá de la decoración (paredes, techos, olores).",
-      "Toma notas y compara objetivamente."
+      "Visitas propiedades que realmente cumplen con tus criterios principales.",
+      "Observas detalles importantes más allá de la pintura: techos, ventanas y sistemas.",
+      "Comparas las opciones con cabeza fría, tomando notas y fotos.",
+      "Evalúas el vecindario en diferentes momentos del día."
     ],
     toAdvance: [
       "Encontrar la casa que cumple tus 3 no-negociables."
@@ -107,9 +112,10 @@ const stepsData: StepContent[] = [
     shortDesc: "Hacerlo oficial",
     icon: PenTool,
     whatToDo: [
-      "Decide el precio basado en datos comparables.",
-      "Define las contingencias (inspección, financiamiento).",
-      "Envía la oferta por escrito con seriedad."
+      "Revisas cuánto valen casas similares para no pagar de más.",
+      "Decides cuánto ofrecer y bajo qué condiciones (fechas, inspecciones).",
+      "Envías una propuesta formal por escrito al vendedor.",
+      "Estás listo para negociar si el vendedor hace una contraoferta."
     ],
     toAdvance: [
       "Tener una oferta aceptada y firmada."
@@ -123,9 +129,10 @@ const stepsData: StepContent[] = [
     shortDesc: "Cierre seguro",
     icon: FileText,
     whatToDo: [
-      "Coordina la inspección física de la casa.",
-      "Espera el avalúo (appraisal) del banco.",
-      "Revisa y firma los documentos finales de cierre."
+      "Contratas a un inspector para revisar la casa a fondo.",
+      "El banco envía a un evaluador para confirmar el valor de la propiedad.",
+      "Obtienes el seguro de la propiedad y aseguras los servicios básicos.",
+      "Revisas y firmas todos los documentos legales finales."
     ],
     toAdvance: [
       "Recibir el 'Clear to Close' y fecha de firma."
@@ -139,9 +146,10 @@ const stepsData: StepContent[] = [
     shortDesc: "¡Meta cumplida!",
     icon: Key,
     whatToDo: [
-      "Haz la caminata final (walkthrough) de la casa.",
-      "Recibe tus llaves y celebra.",
-      "Guarda todos tus documentos importantes."
+      "Haces un recorrido final para verificar que la casa está lista.",
+      "Firmas las escrituras y transfieres el pago final.",
+      "Recibes las llaves de tu nuevo hogar.",
+      "Guardas todos tus documentos en un lugar seguro para el futuro."
     ],
     toAdvance: [
       "¡Mudarte y disfrutar tu nuevo hogar!"
@@ -385,7 +393,7 @@ const StepDetailContent = ({ step, onNext, onClose, isMobile = false }: { step: 
                 >
                     <span className="flex items-center gap-2">
                         <Sparkles className="w-4 h-4 fill-current" />
-                        Profundizar este paso con IA
+                        Profundizar este paso con Agentes de IA
                     </span>
                     <ArrowRight className="w-4 h-4 opacity-70" />
                 </Button>
@@ -395,7 +403,7 @@ const StepDetailContent = ({ step, onNext, onClose, isMobile = false }: { step: 
                     className="w-full border-[#BDB2A4] text-[#17140F] hover:bg-[#E5E1D8] text-sm py-5"
                 >
                    <MessageSquare className="w-4 h-4 mr-2" />
-                   Hablar con mi Realtor – Lianet Espinosa
+                   Hablar con mi Realtor – Lianet Espinosa Ojeda
                 </Button>
             </div>
         </div>
