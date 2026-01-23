@@ -27,15 +27,15 @@ const stepsData: StepContent[] = [
     shortDesc: "Claridad y metas",
     icon: Brain,
     whatToDo: [
-      "Analizas por qué quieres comprar (¿es por espacio, inversión o independencia?)",
-      "Distingues entre lo que realmente necesitas (como número de cuartos) y lo que te gustaría tener (como una piscina).",
-      "Conversas con tu familia para asegurar que todos tienen la misma meta.",
-      "Revisas tus finanzas personales para saber cuánto puedes pagar cómodamente cada mes."
+      "Reflexionas sobre tus motivos reales: ¿buscas espacio, independencia o inversión?",
+      "Distingues entre lo que es indispensable para tu vida diaria y lo que sería un extra agradable.",
+      "Conversas con tu familia para alinear prioridades y evitar conflictos futuros.",
+      "Analizas tu presupuesto mensual personal para definir con qué cifra te sientes cómodo."
     ],
     toAdvance: [
       "Tener una lista escrita de tus 3 prioridades no negociables."
     ],
-    realtorValue: "Lianet te ayuda a traducir tus deseos en un plan realista, filtrando lo que el mercado realmente ofrece en tu zona.",
+    realtorValue: "Lianet te ayuda a traducir tus deseos personales en un plan de búsqueda realista, filtrando lo que el mercado actual ofrece.",
     gptAgentId: "decision-gpt"
   },
   {
@@ -44,15 +44,15 @@ const stepsData: StepContent[] = [
     shortDesc: "Salud financiera",
     icon: CreditCard,
     whatToDo: [
-      "Revisas tu historial de crédito para asegurarte de que no haya errores.",
-      "Calculas cuánto dinero tienes ahorrado para el pago inicial y los gastos de cierre.",
-      "Reúnes tus documentos importantes: recibos de nómina, estados de cuenta y declaraciones de impuestos.",
-      "Determinas cuánto es lo máximo que quieres pagar, no solo lo que el banco te prestaría."
+      "Revisas tus ahorros disponibles para el pago inicial y los gastos de cierre.",
+      "Verificas tu propio historial de crédito para detectar posibles errores.",
+      "Reúnes tus documentos financieros personales (recibos de nómina, estados de cuenta).",
+      "Evitas hacer compras grandes o solicitar nuevos créditos durante esta etapa."
     ],
     toAdvance: [
-      "Conocer tu capacidad de compra real."
+      "Conocer exactamente cuánto capital líquido tienes disponible hoy."
     ],
-    realtorValue: "Lianet te conecta con prestamistas de confianza y te alerta sobre gastos ocultos que los calculadores online no ven.",
+    realtorValue: "Lianet te conecta con prestamistas de confianza y te orienta sobre los costos ocultos que debes considerar más allá del precio de venta.",
     gptAgentId: "finanzas-gpt"
   },
   {
@@ -61,15 +61,15 @@ const stepsData: StepContent[] = [
     shortDesc: "Presupuesto real",
     icon: Landmark,
     whatToDo: [
-      "Contactas a varios prestamistas para comparar tasas y costos.",
-      "Entregas tu documentación financiera para que evalúen tu perfil.",
-      "Recibes una carta oficial que dice cuánto dinero te pueden prestar.",
-      "Entiendes claramente cuál sería tu pago mensual total (incluyendo impuestos y seguros)."
+      "Entregas tu documentación financiera al prestamista para su evaluación.",
+      "Revisas las diferentes opciones de préstamo que te presentan.",
+      "Comprendes cuál sería tu pago mensual total estimado (incluyendo impuestos y seguros).",
+      "Obtienes la carta oficial que confirma cuánto dinero te puede prestar el banco."
     ],
     toAdvance: [
-      "Tener la carta de pre-aprobación en mano."
+      "Tener la carta de pre-aprobación oficial en tu correo electrónico."
     ],
-    realtorValue: "Una carta de pre-aprobación sólida hace que los vendedores te tomen en serio. Lianet asegura que tu oferta sea competitiva desde el día uno.",
+    realtorValue: "Lianet se asegura de que tu carta de pre-aprobación sea sólida y competitiva, lo cual es vital para que los vendedores tomen en serio tu oferta.",
     gptAgentId: "preaprobacion-gpt"
   },
   {
@@ -78,15 +78,15 @@ const stepsData: StepContent[] = [
     shortDesc: "Plan de mercado",
     icon: Compass,
     whatToDo: [
-      "Decides en qué zonas te gustaría vivir basándote en precios, escuelas y transporte.",
-      "Defines si buscas una casa unifamiliar, un apartamento o una casa adosada.",
-      "Estableces un calendario realista: ¿cuándo necesitas mudarte?",
-      "Te preparas mentalmente para el ritmo del mercado actual."
+      "Decides las zonas específicas donde te gustaría vivir (basado en escuelas, trabajo, familia).",
+      "Defines el tipo de propiedad que se ajusta a tu estilo de vida (casa, apartamento, etc.).",
+      "Estableces tu calendario ideal: ¿para qué fecha necesitas estar mudado?",
+      "Te preparas mentalmente para tomar decisiones rápidas si el mercado lo requiere."
     ],
     toAdvance: [
-      "Tener un calendario de visitas y alertas activas."
+      "Tener claras las zonas objetivo y el rango de fechas para la mudanza."
     ],
-    realtorValue: "Lianet analiza los datos del mercado local para decirte si una zona está subiendo o bajando de precio, protegiendo tu inversión.",
+    realtorValue: "Lianet analiza los datos del mercado local para diseñar la estrategia de búsqueda más efectiva según tus tiempos y presupuesto.",
     gptAgentId: "estrategia-gpt"
   },
   {
@@ -95,15 +95,15 @@ const stepsData: StepContent[] = [
     shortDesc: "Visitas inteligentes",
     icon: Home,
     whatToDo: [
-      "Visitas propiedades que realmente cumplen con tus criterios principales.",
-      "Observas detalles importantes más allá de la pintura: techos, ventanas y sistemas.",
-      "Comparas las opciones con cabeza fría, tomando notas y fotos.",
-      "Evalúas el vecindario en diferentes momentos del día."
+      "Asistes a las visitas programadas de las propiedades que cumplen tus criterios.",
+      "Observas detalles importantes más allá de la estética (ruidos, luz natural, espacios).",
+      "Tomas notas y compartes tu opinión honesta sobre cada casa visitada.",
+      "Evalúas cómo te sientes en el vecindario en diferentes momentos del día."
     ],
     toAdvance: [
-      "Encontrar la casa que cumple tus 3 no-negociables."
+      "Identificar la casa que cumple con tus requisitos no negociables."
     ],
-    realtorValue: "Lianet ve lo que tú no ves: problemas estructurales, ruidos del vecindario y el potencial real de reventa.",
+    realtorValue: "Lianet filtra el inventario para ahorrarte tiempo y te señala detalles críticos de las propiedades que un ojo inexperto podría pasar por alto.",
     gptAgentId: "busqueda-gpt"
   },
   {
@@ -112,15 +112,15 @@ const stepsData: StepContent[] = [
     shortDesc: "Hacerlo oficial",
     icon: PenTool,
     whatToDo: [
-      "Revisas cuánto valen casas similares para no pagar de más.",
-      "Decides cuánto ofrecer y bajo qué condiciones (fechas, inspecciones).",
-      "Envías una propuesta formal por escrito al vendedor.",
-      "Estás listo para negociar si el vendedor hace una contraoferta."
+      "Revisas el análisis de precio y la estrategia de oferta que te presenta tu agente.",
+      "Autorizas el precio y las condiciones (fechas, contingencias) que se incluirán.",
+      "Firmas la propuesta formal para enviarla al vendedor.",
+      "Te mantienes disponible para responder si hay una contraoferta del vendedor."
     ],
     toAdvance: [
-      "Tener una oferta aceptada y firmada."
+      "Tener el contrato de compraventa aceptado y firmado por ambas partes."
     ],
-    realtorValue: "Aquí es donde Lianet brilla: negocia el precio y los términos a tu favor, usando su experiencia para ganar en mercados competitivos.",
+    realtorValue: "Lianet redacta y presenta tu oferta de manera profesional, y negocia firmemente los términos y el precio para proteger tus intereses.",
     gptAgentId: "oferta-gpt"
   },
   {
@@ -129,15 +129,15 @@ const stepsData: StepContent[] = [
     shortDesc: "Cierre seguro",
     icon: FileText,
     whatToDo: [
-      "Contratas a un inspector para revisar la casa a fondo.",
-      "El banco envía a un evaluador para confirmar el valor de la propiedad.",
-      "Obtienes el seguro de la propiedad y aseguras los servicios básicos.",
-      "Revisas y firmas todos los documentos legales finales."
+      "Facilitas el acceso para la inspección y revisas el reporte de resultados.",
+      "Esperas la confirmación del valor de la propiedad por parte del banco (avalúo).",
+      "Mantienes tus finanzas estables (sin nuevos créditos) hasta el día final.",
+      "Revisas y firmas los documentos de cierre y la divulgación final de costos."
     ],
     toAdvance: [
-      "Recibir el 'Clear to Close' y fecha de firma."
+      "Recibir la confirmación final del banco (Clear to Close) y la fecha de firma."
     ],
-    realtorValue: "Lianet es la directora de orquesta: coordina inspectores, abogados y banco para que no pierdas fechas ni dinero.",
+    realtorValue: "Lianet coordina a todos los involucrados (inspectores, casa de títulos, banco) para asegurar que se cumplan los plazos contractuales sin estrés.",
     gptAgentId: "cierre-gpt"
   },
   {
@@ -146,15 +146,15 @@ const stepsData: StepContent[] = [
     shortDesc: "¡Meta cumplida!",
     icon: Key,
     whatToDo: [
-      "Haces un recorrido final para verificar que la casa está lista.",
-      "Firmas las escrituras y transfieres el pago final.",
-      "Recibes las llaves de tu nuevo hogar.",
-      "Guardas todos tus documentos en un lugar seguro para el futuro."
+      "Realizas el recorrido final para verificar que la casa está en las condiciones acordadas.",
+      "Firmas las escrituras ante notario o compañía de títulos.",
+      "Realizas la transferencia final de los fondos necesarios.",
+      "Recibes las llaves y tomas posesión de tu nuevo hogar."
     ],
     toAdvance: [
-      "¡Mudarte y disfrutar tu nuevo hogar!"
+      "¡Mudarte y comenzar tu nueva vida en tu casa propia!"
     ],
-    realtorValue: "La relación no termina aquí. Lianet sigue siendo tu recurso para dudas sobre impuestos, valor de casa o proveedores de confianza.",
+    realtorValue: "Lianet te acompaña hasta el último momento y sigue siendo tu recurso de confianza para cualquier necesidad futura relacionada con tu hogar.",
     gptAgentId: "meta-gpt",
     isGoal: true
   }
