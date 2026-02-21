@@ -22,7 +22,7 @@ const cities = ["Miami", "Orlando", "Tampa", "Jacksonville", "Fort Lauderdale", 
 const budgets = ["$100K-200K", "$200K-300K", "$300K-400K", "$400K-500K", "$500K-750K", "$750K-1M", "$1M+"];
 const bedroomOptions = ["1", "2", "3", "4", "5+"];
 
-const LOFTY_BASE_URL = "https://lianetespinosaojeda.expportal.com/listing";
+const LOFTY_BASE_URL = "https://lianetespinosaojeda.expportal.com";
 
 const contextToProfile: Record<string, string> = {
   comprador: "comprador",
@@ -288,25 +288,42 @@ export const LeadModal = ({ open, onOpenChange, context = "general" }: LeadModal
   }, [context]);
 
   const buildLoftyUrl = () => {
-    const cityParam = city || "Orlando";
-    const condition: Record<string, unknown> = {
-      location: { city: [`${cityParam}, FL`] },
-    };
+    if (!city && !budget && !bedrooms) {
+      return `${LOFTY_BASE_URL}/listing`;
+    }
+
+    const condition: Record<string, unknown> = {};
+
+    if (city && city !== "Otra") {
+      condition.location = { city: [`${city}, FL`] };
+    }
+
     if (budget) {
-      const maxPrice = budget.replace(/[^0-9KMk+]/g, "");
+      const parts = budget.replace(/\$/g, "").split("-");
+      const maxPart = parts.length > 1 ? parts[1] : parts[0];
       let priceNum = "";
-      if (maxPrice.includes("M") || maxPrice.includes("m")) {
-        priceNum = String(parseInt(maxPrice) * 1000000);
-      } else if (maxPrice.includes("K") || maxPrice.includes("k")) {
-        priceNum = String(parseInt(maxPrice) * 1000);
+      if (maxPart.includes("M") || maxPart.includes("m")) {
+        priceNum = String(parseFloat(maxPart.replace(/[^0-9.]/g, "")) * 1000000);
+      } else if (maxPart.includes("K") || maxPart.includes("k")) {
+        priceNum = String(parseFloat(maxPart.replace(/[^0-9.]/g, "")) * 1000);
       }
       if (priceNum) condition.price = `,${priceNum}`;
     }
+
     if (bedrooms) {
       const bedsVal = bedrooms.replace("+", "");
       condition.beds = `${bedsVal},`;
     }
-    return `${LOFTY_BASE_URL}?condition=${encodeURIComponent(JSON.stringify(condition))}`;
+
+    const params = new URLSearchParams({
+      listingSource: "all listings",
+      condition: JSON.stringify(condition),
+      uiConfig: "{}",
+      zoom: "13",
+      page: "1",
+    });
+
+    return `${LOFTY_BASE_URL}/listing?${params.toString()}`;
   };
 
   const mutation = useMutation({
@@ -315,7 +332,7 @@ export const LeadModal = ({ open, onOpenChange, context = "general" }: LeadModal
       return res.json();
     },
     onSuccess: () => {
-      if (context === "busqueda") {
+      if (context === "busqueda" || context === "general") {
         setShowRedirectTransition(true);
       } else {
         setSubmitted(true);

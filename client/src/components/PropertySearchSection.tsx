@@ -14,24 +14,8 @@ export const PropertySearchSection = () => {
   const [beds, setBeds] = useState("");
   const [leadOpen, setLeadOpen] = useState(false);
 
-  const goToIDX = () => {
-    // === INTEGRACIÓN LOFTY IDX ===
-    // URL: process.env.LOFTY_IDX_URL (configurar en variables de entorno)
-    // Se usa para abrir búsqueda de propiedades en portal MLS
-    // Opciones: iframe embed o redirect
-    // Ejemplo: window.open(`${LOFTY_IDX_URL}?city=${city}&price=${maxPrice}&beds=${beds}`, '_blank');
-    console.log("goToIDX: redirigir a portal IDX", { city, maxPrice, beds });
-  };
-
   const handleSearch = () => {
     setLeadOpen(true);
-  };
-
-  const handleLeadClose = (open: boolean) => {
-    if (!open) {
-      goToIDX();
-    }
-    setLeadOpen(open);
   };
 
   const selectClass = "bg-white border border-[#BDB2A4]/20 rounded-lg p-4 outline-none focus:border-primary transition-all duration-300 text-[#17140F] text-sm w-full appearance-none cursor-pointer";
@@ -120,7 +104,7 @@ export const PropertySearchSection = () => {
         </p>
       </div>
 
-      <LeadModal open={leadOpen} onOpenChange={handleLeadClose} context="busqueda" />
+      <LeadModal open={leadOpen} onOpenChange={setLeadOpen} context="busqueda" />
     </section>
   );
 };
