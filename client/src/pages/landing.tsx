@@ -1,14 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, lazy, Suspense } from "react";
 import { Staircase } from "@/components/Staircase";
 import { DiagnosticModal } from "@/components/DiagnosticModal";
 import { LeadModal } from "@/components/LeadModal";
 import { Navbar } from "@/components/Navbar";
-import { VendedoresSection } from "@/components/VendedoresSection";
-import { InversionistasSection } from "@/components/InversionistasSection";
-import { RealtorsIASection } from "@/components/RealtorsIASection";
-import { PropertySearchSection } from "@/components/PropertySearchSection";
 import { Footer } from "@/components/Footer";
-import { ChatbotAna } from "@/components/ChatbotAna";
+
+const VendedoresSection = lazy(() => import("@/components/VendedoresSection").then(m => ({ default: m.VendedoresSection })));
+const InversionistasSection = lazy(() => import("@/components/InversionistasSection").then(m => ({ default: m.InversionistasSection })));
+const RealtorsIASection = lazy(() => import("@/components/RealtorsIASection").then(m => ({ default: m.RealtorsIASection })));
+const PropertySearchSection = lazy(() => import("@/components/PropertySearchSection").then(m => ({ default: m.PropertySearchSection })));
+const ChatbotAna = lazy(() => import("@/components/ChatbotAna").then(m => ({ default: m.ChatbotAna })));
 import { Button } from "@/components/ui/button";
 import { ArrowDown, Check } from "lucide-react";
 import { motion } from "framer-motion";
@@ -40,7 +41,7 @@ export default function LandingPage() {
           <div className="absolute inset-0 z-0">
             <img
               src="/assets/hero-bg.png"
-              alt="Interior minimalista"
+              alt="Vista de un interior moderno y luminoso en Florida"
               className="w-full h-full object-cover opacity-90"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-[#F8F6F2] via-[#F8F6F2]/90 to-transparent z-10" />
@@ -193,7 +194,7 @@ export default function LandingPage() {
           <div className="py-24 bg-white relative">
             <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
               <div className="relative h-[500px] rounded-2xl overflow-hidden shadow-2xl">
-                <img src="/assets/key-hand.png" alt="Llaves de casa nueva" className="w-full h-full object-cover" />
+                <img src="/assets/key-hand.png" alt="Mano entregando las llaves de una casa nueva" loading="lazy" className="w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-black/20" />
                 <div className="absolute bottom-8 left-8 right-8 text-white">
                   <div className="bg-white/10 backdrop-blur-md p-6 rounded-xl border border-white/20">
@@ -250,16 +251,24 @@ export default function LandingPage() {
         </section>
 
         {/* 3. VENDEDORES */}
-        <VendedoresSection />
+        <Suspense fallback={null}>
+          <VendedoresSection />
+        </Suspense>
 
         {/* 4. INVERSIONISTAS */}
-        <InversionistasSection />
+        <Suspense fallback={null}>
+          <InversionistasSection />
+        </Suspense>
 
         {/* 5. REALTORS IA */}
-        <RealtorsIASection />
+        <Suspense fallback={null}>
+          <RealtorsIASection />
+        </Suspense>
 
         {/* 6. BUSCAR */}
-        <PropertySearchSection />
+        <Suspense fallback={null}>
+          <PropertySearchSection />
+        </Suspense>
 
         {/* 7. CTA FINAL */}
         <section className="py-32 bg-[#17140F] text-[#F8F6F2] text-center px-6 relative overflow-hidden">
@@ -294,7 +303,9 @@ export default function LandingPage() {
       <LeadModal open={leadModalOpen} onOpenChange={setLeadModalOpen} context={(leadContext as any) || "general"} />
 
       {/* Chatbot */}
-      <ChatbotAna />
+      <Suspense fallback={null}>
+        <ChatbotAna />
+      </Suspense>
 
       {/* Floating CTA mobile */}
       <motion.div

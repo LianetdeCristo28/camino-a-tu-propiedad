@@ -3,6 +3,11 @@
 
 @custom-variant dark (&:is(.dark *));
 
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px;
+}
+
 :root {
   --bg-primary: #F8F6F2;
   --bg-soft: #E5E1D8;
@@ -107,4 +112,10 @@
   .subtle-shadow {
     box-shadow: 0 10px 40px -10px rgba(23, 20, 15, 0.08);
   }
+}
+
+*:focus-visible {
+  outline: 2px solid var(--luxury-gold);
+  outline-offset: 2px;
+  border-radius: 4px;
 }

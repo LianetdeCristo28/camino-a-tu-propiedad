@@ -29,7 +29,7 @@ export const Navbar = () => {
   ];
 
   return (
-    <nav className={cn(
+    <nav role="navigation" aria-label="Navegación principal" className={cn(
       "sticky top-0 z-50 w-full transition-all duration-300 bg-[#F8F6F2]/95 backdrop-blur-md px-6 py-4",
       scrolled ? "shadow-md" : ""
     )}>
@@ -65,7 +65,7 @@ export const Navbar = () => {
         <div className="lg:hidden">
           <Sheet>
             <SheetTrigger asChild>
-              <button className="p-2 -mr-2">
+              <button className="p-2 -mr-2" aria-label="Abrir menú de navegación">
                 <Menu className="w-6 h-6 text-[#17140F]" />
               </button>
             </SheetTrigger>

@@ -276,7 +276,7 @@ export const Staircase = () => {
                 whileInView={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.8, type: "spring" }}
             >
-                <img src="/assets/goal-house.png" alt="Casa Comprada" className="w-full h-full object-contain drop-shadow-2xl" />
+                <img src="/assets/goal-house.png" alt="Ilustración de tu futura casa en Florida" loading="lazy" className="w-full h-full object-contain drop-shadow-2xl" />
                 
                 {/* Glow Effect */}
                 <div className="absolute inset-0 bg-primary/20 blur-3xl -z-10 rounded-full animate-pulse" />
