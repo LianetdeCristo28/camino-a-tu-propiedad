@@ -9,7 +9,7 @@ export const ChatbotAna = () => {
     <>
       <button 
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-24 md:bottom-8 right-6 md:right-8 z-50 w-14 h-14 bg-primary text-[#17140F] rounded-full shadow-[0_10px_40px_-10px_rgba(210,180,99,0.5)] flex items-center justify-center hover:scale-105 transition-transform"
+        className="fixed bottom-24 md:bottom-8 right-6 md:right-8 z-50 w-14 h-14 bg-primary text-[#17140F] rounded-full shadow-md flex items-center justify-center hover:scale-105 transition-all duration-300 hover:bg-primary/90"
       >
         <MessageCircle className="w-6 h-6" />
       </button>
@@ -20,7 +20,7 @@ export const ChatbotAna = () => {
             initial={{ opacity: 0, y: 50, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 50, scale: 0.95 }}
-            className="fixed bottom-24 md:bottom-28 right-6 md:right-8 z-50 w-[350px] max-h-[500px] h-[70vh] bg-white rounded-2xl shadow-2xl border border-[#BDB2A4]/30 flex flex-col overflow-hidden"
+            className="fixed bottom-24 md:bottom-28 right-6 md:right-8 z-50 w-[350px] max-h-[500px] h-[70vh] bg-white rounded-2xl shadow-xl border border-[#BDB2A4]/20 flex flex-col overflow-hidden"
           >
             <div className="bg-[#17140F] p-4 flex items-center justify-between text-white">
               <div className="flex items-center gap-3">

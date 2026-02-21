@@ -15,7 +15,7 @@
 }
 
 @theme inline {
-  --font-sans: "DM Sans", sans-serif;
+  --font-sans: "Inter", sans-serif;
   --font-serif: "Playfair Display", serif;
   
   --radius-sm: 0.25rem;

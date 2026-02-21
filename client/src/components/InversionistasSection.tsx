@@ -39,7 +39,7 @@ export const InversionistasSection = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className="bg-white/5 border border-white/10 p-8 rounded-2xl hover:bg-white/10 transition-colors"
+              className="bg-white/5 border border-white/10 p-8 rounded-2xl hover:bg-white/10 transition-all duration-300"
             >
               <item.icon className="w-10 h-10 text-primary mb-6" />
               <h3 className="text-xl font-serif font-bold mb-3">{item.title}</h3>

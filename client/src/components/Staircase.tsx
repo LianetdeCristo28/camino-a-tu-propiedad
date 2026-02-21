@@ -232,10 +232,10 @@ export const Staircase = () => {
                             step.isGoal ? "bg-primary text-primary-foreground border-primary" : "bg-[#F8F6F2] text-foreground border border-[#BDB2A4]/40",
                             // Hover & Active States
                             activeStepId === step.id 
-                                ? "shadow-xl ring-2 ring-primary ring-offset-2 scale-105 -translate-y-2" 
-                                : "hover:-translate-y-1 hover:shadow-lg hover:border-primary/50",
+                                ? "shadow-md ring-2 ring-primary ring-offset-2 scale-105 -translate-y-2" 
+                                : "hover:-translate-y-1 hover:shadow-sm hover:border-primary/50",
                             // 3D Side Effect (Pseudo-element logic simpler with shadow for now)
-                            "shadow-[4px_4px_0px_0px_rgba(189,178,164,0.3)]"
+                            "shadow-[2px_2px_0px_0px_rgba(189,178,164,0.2)]"
                         )}>
                             <div className="flex justify-between items-start">
                                 <span className={cn(
@@ -291,7 +291,7 @@ export const Staircase = () => {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 20 }}
-                className="w-full md:w-[350px] lg:w-[400px] bg-white rounded-2xl shadow-2xl border border-border overflow-hidden sticky top-24 h-fit z-40"
+                className="w-full md:w-[350px] lg:w-[400px] bg-white rounded-2xl shadow-lg border border-[#BDB2A4]/20 overflow-hidden sticky top-24 h-fit z-40"
             >
                <StepDetailContent step={activeStepData} onNext={handleNextStep} onClose={() => setActiveStepId(null)} />
             </motion.div>
@@ -389,7 +389,7 @@ const StepDetailContent = ({ step, onNext, onClose, isMobile = false }: { step: 
             {/* Footer Actions */}
             <div className="p-6 pt-4 border-t bg-white mt-auto space-y-3">
                 <Button 
-                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-md py-6 shadow-lg shadow-primary/20 group justify-between"
+                    className="w-full bg-primary hover:bg-primary/90 text-[#17140F] font-bold text-md py-6 shadow-sm group justify-between rounded-full transition-all duration-300"
                 >
                     <span className="flex items-center gap-2">
                         <Sparkles className="w-4 h-4 fill-current" />
@@ -400,7 +400,7 @@ const StepDetailContent = ({ step, onNext, onClose, isMobile = false }: { step: 
 
                 <Button 
                     variant="outline"
-                    className="w-full border-[#BDB2A4] text-[#17140F] hover:bg-[#E5E1D8] text-sm py-5"
+                    className="w-full border border-[#BDB2A4]/20 text-[#17140F] hover:bg-[#E5E1D8] text-sm py-5 rounded-lg transition-all duration-300"
                 >
                    <MessageSquare className="w-4 h-4 mr-2" />
                    Hablar con mi Realtor – Lianet Espinosa Ojeda

@@ -10,11 +10,11 @@ export const RealtorsIASection = () => {
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
-          className="bg-white border border-[#BDB2A4]/30 rounded-3xl p-12 md:p-16 shadow-[0_20px_60px_-15px_rgba(23,20,15,0.05)] relative overflow-hidden"
+          className="bg-white border border-[#BDB2A4]/20 rounded-3xl p-12 md:p-16 shadow-sm relative overflow-hidden transition-all duration-300 hover:shadow-md"
         >
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-primary/10 rounded-full blur-3xl -z-10" />
           
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 text-primary mb-8 border border-primary/20">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 text-primary mb-8 border border-[#BDB2A4]/20">
             <Sparkles className="w-8 h-8" />
           </div>
           
@@ -25,7 +25,7 @@ export const RealtorsIASection = () => {
             La experiencia de Lianet potenciada por inteligencia artificial. Obtén respuestas detalladas sobre tu paso actual en el proceso de compra, análisis rápido de mercado o simulación de escenarios 24/7.
           </p>
           
-          <Button className="bg-[#17140F] text-white hover:bg-[#17140F]/90 text-lg px-8 py-6 rounded-full shadow-lg">
+          <Button className="bg-[#17140F] text-white hover:bg-[#17140F]/90 text-lg px-8 py-6 rounded-full shadow-sm transition-all duration-300">
             Probar Asistente Virtual
           </Button>
         </motion.div>
