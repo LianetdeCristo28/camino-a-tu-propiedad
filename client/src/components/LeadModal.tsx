@@ -1,13 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { CheckCircle2, Loader2 } from "lucide-react";
+import { CheckCircle2, Loader2, Shield, Database, Filter, Sparkles, KeyRound, ArrowUpRight } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import { motion, AnimatePresence } from "framer-motion";
 
 type LeadContext = "comprador" | "vendedor" | "inversionista" | "busqueda" | "general";
 
@@ -20,6 +21,8 @@ interface LeadModalProps {
 const cities = ["Miami", "Orlando", "Tampa", "Jacksonville", "Fort Lauderdale", "Otra"];
 const budgets = ["$100K-200K", "$200K-300K", "$300K-400K", "$400K-500K", "$500K-750K", "$750K-1M", "$1M+"];
 const bedroomOptions = ["1", "2", "3", "4", "5+"];
+
+const LOFTY_BASE_URL = "https://lianetespinosaojeda.expportal.com/listing";
 
 const contextToProfile: Record<string, string> = {
   comprador: "comprador",
@@ -39,6 +42,223 @@ const contextTitles: Record<string, { title: string; desc: string }> = {
 
 const inputClass = "w-full bg-white border border-[#BDB2A4]/20 rounded-lg p-3 outline-none focus:border-[#D2B463] transition-all duration-300 shadow-sm text-[#17140F] text-sm";
 
+type RedirectPhase = "idle" | "loading" | "complete" | "redirecting";
+
+interface TransitionStage {
+  label: string;
+  icon: React.ReactNode;
+  duration: number;
+}
+
+const fadeSlideUp = {
+  initial: { opacity: 0, y: 16 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -12 },
+  transition: { duration: 0.4, ease: "easeOut" as const },
+};
+
+const scaleIn = {
+  initial: { opacity: 0, scale: 0.85 },
+  animate: { opacity: 1, scale: 1 },
+  transition: { duration: 0.5, ease: [0.34, 1.56, 0.64, 1] as [number, number, number, number] },
+};
+
+const RedirectTransition = ({ city, onComplete }: { city: string; onComplete: () => void }) => {
+  const [phase, setPhase] = useState<RedirectPhase>("loading");
+  const [currentStage, setCurrentStage] = useState(0);
+  const [stageProgress, setStageProgress] = useState(0);
+  const [completedStages, setCompletedStages] = useState<number[]>([]);
+  const progressInterval = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const stages: TransitionStage[] = [
+    { label: "Verificando tu perfil", icon: <Shield className="w-4 h-4" />, duration: 800 },
+    { label: "Conectando con Stellar MLS", icon: <Database className="w-4 h-4" />, duration: 1000 },
+    { label: `Filtrando propiedades en ${city || "Florida"}`, icon: <Filter className="w-4 h-4" />, duration: 1200 },
+    { label: "Preparando resultados personalizados", icon: <Sparkles className="w-4 h-4" />, duration: 900 },
+  ];
+
+  useEffect(() => {
+    if (phase !== "loading" || currentStage < 0) return;
+
+    if (currentStage >= stages.length) {
+      setPhase("complete");
+      const t = setTimeout(() => {
+        setPhase("redirecting");
+        onComplete();
+      }, 1200);
+      return () => clearTimeout(t);
+    }
+
+    const stage = stages[currentStage];
+    let progress = 0;
+    const step = 100 / (stage.duration / 30);
+
+    progressInterval.current = setInterval(() => {
+      progress += step;
+      setStageProgress(Math.min(progress, 100));
+
+      if (progress >= 100) {
+        if (progressInterval.current) clearInterval(progressInterval.current);
+        setCompletedStages((prev) => [...prev, currentStage]);
+        setTimeout(() => {
+          setCurrentStage((prev) => prev + 1);
+          setStageProgress(0);
+        }, 200);
+      }
+    }, 30);
+
+    return () => {
+      if (progressInterval.current) clearInterval(progressInterval.current);
+    };
+  }, [phase, currentStage]);
+
+  const totalProgress =
+    phase === "complete" || phase === "redirecting"
+      ? 100
+      : ((completedStages.length + stageProgress / 100) / stages.length) * 100;
+
+  return (
+    <div className="py-2">
+      <div className="text-center mb-6">
+        <motion.div
+          {...scaleIn}
+          className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5 transition-all duration-500 ${
+            phase === "complete" || phase === "redirecting"
+              ? "bg-[#17140F] text-[#D2B463] shadow-[0_0_30px_rgba(210,180,99,0.25)]"
+              : "bg-gradient-to-br from-[#F8F6F2] to-[#E5E1D8] text-[#17140F]"
+          }`}
+        >
+          {phase === "complete" || phase === "redirecting" ? (
+            <KeyRound className="w-7 h-7" />
+          ) : (
+            <Loader2 className="w-7 h-7 animate-spin" />
+          )}
+        </motion.div>
+
+        <h3 className="text-xl font-serif font-bold text-[#17140F] mb-1">
+          {phase === "redirecting" ? "¡Listo!" : phase === "complete" ? "Búsqueda personalizada lista" : "Preparando tu búsqueda"}
+        </h3>
+        <p className="text-sm text-[#BDB2A4]">
+          {phase === "redirecting"
+            ? "Abriendo tus propiedades…"
+            : phase === "complete"
+            ? `Propiedades en ${city || "Florida"}`
+            : "Conectando con el mercado de Florida en tiempo real"}
+        </p>
+      </div>
+
+      <div className="h-1 rounded-full bg-[#F0EDE8] mb-6 overflow-hidden">
+        <motion.div
+          className="h-full rounded-full bg-gradient-to-r from-[#D2B463] to-[#CBB29B]"
+          initial={{ width: "0%" }}
+          animate={{ width: `${totalProgress}%` }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
+        />
+      </div>
+
+      <AnimatePresence mode="wait">
+        {phase !== "redirecting" ? (
+          <motion.div key="stages" className="space-y-1.5" {...fadeSlideUp}>
+            {stages.map((stage, i) => {
+              const isCompleted = completedStages.includes(i);
+              const isActive = currentStage === i && phase === "loading";
+              const isPending = !isCompleted && !isActive;
+
+              return (
+                <motion.div
+                  key={i}
+                  initial={isActive ? { opacity: 0, y: 12 } : false}
+                  animate={{ opacity: isPending && phase === "loading" ? 0.35 : 1, y: 0 }}
+                  transition={{ duration: 0.4 }}
+                  className={`flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl transition-all duration-400 ${
+                    isActive ? "bg-[#F8F6F2]" : ""
+                  }`}
+                >
+                  <div
+                    className={`w-8 h-8 rounded-[10px] flex items-center justify-center flex-shrink-0 transition-all duration-300 ${
+                      isCompleted
+                        ? "bg-[#17140F] text-[#D2B463]"
+                        : isActive
+                        ? "bg-[#E5E1D8] text-[#17140F]"
+                        : "bg-[#F5F3EF] text-[#BDB2A4]"
+                    }`}
+                  >
+                    {isCompleted ? (
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: "spring", stiffness: 500, damping: 15 }}
+                      >
+                        <CheckCircle2 className="w-4 h-4" />
+                      </motion.div>
+                    ) : (
+                      stage.icon
+                    )}
+                  </div>
+
+                  <span
+                    className={`text-sm flex-1 transition-all duration-300 ${
+                      isCompleted || isActive ? "text-[#17140F] font-medium" : "text-[#BDB2A4]"
+                    }`}
+                  >
+                    {stage.label}
+                  </span>
+
+                  {isActive && (
+                    <div className="w-12 h-[3px] rounded-full bg-[#E5E1D8] overflow-hidden">
+                      <motion.div
+                        className="h-full bg-[#D2B463] rounded-full"
+                        initial={{ width: "0%" }}
+                        animate={{ width: `${stageProgress}%` }}
+                        transition={{ duration: 0.05, ease: "linear" }}
+                      />
+                    </div>
+                  )}
+                </motion.div>
+              );
+            })}
+          </motion.div>
+        ) : (
+          <motion.div
+            key="redirecting"
+            {...scaleIn}
+            className="text-center py-3"
+          >
+            <motion.div
+              animate={{ y: [0, -8, 0] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              className="inline-flex items-center gap-2.5 bg-[#17140F] text-[#F8F6F2] px-7 py-3.5 rounded-full text-sm font-medium"
+            >
+              <span>Abriendo propiedades</span>
+              <motion.span
+                animate={{ x: [0, 3, 0], y: [0, -3, 0] }}
+                transition={{ duration: 1, repeat: Infinity, ease: "easeInOut" }}
+                className="inline-flex"
+              >
+                <ArrowUpRight className="w-4 h-4" />
+              </motion.span>
+            </motion.div>
+            <p className="mt-4 text-xs text-[#BDB2A4]">
+              Se abrirá una nueva pestaña con tus resultados
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <div className="mt-6 pt-3.5 border-t border-[#BDB2A4]/15 flex items-center justify-center gap-2">
+        <div
+          className={`w-1.5 h-1.5 rounded-full transition-colors duration-300 ${
+            phase === "complete" || phase === "redirecting" ? "bg-green-400" : "bg-[#D2B463]"
+          }`}
+        />
+        <span className="text-[11px] text-[#BDB2A4] tracking-wide">
+          Stellar MLS · Datos verificados en tiempo real
+        </span>
+      </div>
+    </div>
+  );
+};
+
 export const LeadModal = ({ open, onOpenChange, context = "general" }: LeadModalProps) => {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -52,10 +272,33 @@ export const LeadModal = ({ open, onOpenChange, context = "general" }: LeadModal
   const [message, setMessage] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [emailError, setEmailError] = useState("");
+  const [showRedirectTransition, setShowRedirectTransition] = useState(false);
 
   useEffect(() => {
     setProfileType(contextToProfile[context] || "");
   }, [context]);
+
+  const buildLoftyUrl = useCallback(() => {
+    const cityParam = city || "Orlando";
+    const condition: Record<string, unknown> = {
+      location: { city: [`${cityParam}, FL`] },
+    };
+    if (budget) {
+      const maxPrice = budget.replace(/[^0-9KMk+]/g, "");
+      let priceNum = "";
+      if (maxPrice.includes("M") || maxPrice.includes("m")) {
+        priceNum = String(parseInt(maxPrice) * 1000000);
+      } else if (maxPrice.includes("K") || maxPrice.includes("k")) {
+        priceNum = String(parseInt(maxPrice) * 1000);
+      }
+      if (priceNum) condition.price = `,${priceNum}`;
+    }
+    if (bedrooms) {
+      const bedsVal = bedrooms.replace("+", "");
+      condition.beds = `${bedsVal},`;
+    }
+    return `${LOFTY_BASE_URL}?condition=${encodeURIComponent(JSON.stringify(condition))}`;
+  }, [city, budget, bedrooms]);
 
   const mutation = useMutation({
     mutationFn: async (data: Record<string, unknown>) => {
@@ -63,7 +306,11 @@ export const LeadModal = ({ open, onOpenChange, context = "general" }: LeadModal
       return res.json();
     },
     onSuccess: () => {
-      setSubmitted(true);
+      if (context === "busqueda") {
+        setShowRedirectTransition(true);
+      } else {
+        setSubmitted(true);
+      }
     },
   });
 
@@ -97,6 +344,13 @@ export const LeadModal = ({ open, onOpenChange, context = "general" }: LeadModal
     });
   };
 
+  const handleRedirectComplete = useCallback(() => {
+    const url = buildLoftyUrl();
+    setTimeout(() => {
+      window.open(url, "_blank");
+    }, 1200);
+  }, [buildLoftyUrl]);
+
   const reset = () => {
     setFullName("");
     setEmail("");
@@ -110,6 +364,7 @@ export const LeadModal = ({ open, onOpenChange, context = "general" }: LeadModal
     setMessage("");
     setSubmitted(false);
     setEmailError("");
+    setShowRedirectTransition(false);
     mutation.reset();
   };
 
@@ -123,17 +378,25 @@ export const LeadModal = ({ open, onOpenChange, context = "general" }: LeadModal
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-lg bg-[#F8F6F2] border border-[#BDB2A4]/20 p-0 overflow-hidden shadow-lg rounded-2xl max-h-[90vh] overflow-y-auto">
-        <div className="bg-[#17140F] p-6 text-[#F8F6F2] text-center sticky top-0 z-10">
-          <DialogTitle className="text-2xl font-serif font-bold text-white">
-            {info.title}
-          </DialogTitle>
-          <DialogDescription className="text-white/70 mt-2">
-            {info.desc}
-          </DialogDescription>
-        </div>
+        {!showRedirectTransition && (
+          <div className="bg-[#17140F] p-6 text-[#F8F6F2] text-center sticky top-0 z-10">
+            <DialogTitle className="text-2xl font-serif font-bold text-white">
+              {info.title}
+            </DialogTitle>
+            <DialogDescription className="text-white/70 mt-2">
+              {info.desc}
+            </DialogDescription>
+          </div>
+        )}
+
+        {showRedirectTransition && (
+          <DialogTitle className="sr-only">Buscando propiedades</DialogTitle>
+        )}
 
         <div className="p-6 md:p-8">
-          {submitted ? (
+          {showRedirectTransition ? (
+            <RedirectTransition city={city} onComplete={handleRedirectComplete} />
+          ) : submitted ? (
             <div className="text-center space-y-4 py-6">
               <div className="w-16 h-16 bg-[#D2B463]/20 rounded-full flex items-center justify-center mx-auto text-[#D2B463]">
                 <CheckCircle2 className="w-8 h-8" />
