@@ -12,7 +12,7 @@ interface LeadCaptureModalProps {
 }
 
 export const LeadCaptureModal = ({ open, onOpenChange, context }: LeadCaptureModalProps) => {
-  const defaultInterest = context === "comprador" ? "Quiero comprar" : context === "vendedor" ? "Quiero vender" : context === "inversionista" ? "Busco invertir" : "Quiero comprar";
+  const defaultInterest = context === "comprador" ? "Quiero comprar" : context === "vendedor" ? "Quiero vender" : context === "inversionista" ? "Busco invertir" : context === "busqueda" ? "Búsqueda de propiedades" : "Quiero comprar";
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -62,11 +62,13 @@ export const LeadCaptureModal = ({ open, onOpenChange, context }: LeadCaptureMod
       <DialogContent className="sm:max-w-md bg-[#F8F6F2] border border-[#BDB2A4]/20 p-0 overflow-hidden shadow-lg rounded-2xl">
         <div className="bg-[#17140F] p-6 text-[#F8F6F2] text-center">
             <DialogTitle className="text-2xl font-serif font-bold text-white">
-              {context === "vendedor" ? "Solicita tu Análisis CMA" : "Hablemos de tus metas"}
+              {context === "vendedor" ? "Solicita tu Análisis CMA" : context === "busqueda" ? "Accede a Propiedades Activas" : "Hablemos de tus metas"}
             </DialogTitle>
             <DialogDescription className="text-white/70 mt-2">
               {context === "vendedor"
                 ? "Recibe una evaluación gratuita del valor de tu propiedad."
+                : context === "busqueda"
+                ? "Déjanos tus datos para enviarte listados personalizados."
                 : "Déjanos tus datos y nos comunicaremos contigo en menos de 24 horas."}
             </DialogDescription>
         </div>
@@ -102,7 +104,7 @@ export const LeadCaptureModal = ({ open, onOpenChange, context }: LeadCaptureMod
                   <input data-testid="input-property-address" type="text" value={propertyAddress} onChange={(e) => setPropertyAddress(e.target.value)} className="w-full bg-white border border-[#BDB2A4]/20 rounded-lg p-3 outline-none focus:border-primary transition-all duration-300 shadow-sm" placeholder="123 Main St, Miami, FL" />
                 </div>
               )}
-              {context !== "vendedor" && context !== "comprador" && context !== "inversionista" && (
+              {context !== "vendedor" && context !== "comprador" && context !== "inversionista" && context !== "busqueda" && (
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-[#17140F]">¿En qué te podemos ayudar?</label>
                   <select data-testid="select-interest" value={interest} onChange={(e) => setInterest(e.target.value)} className="w-full bg-white border border-[#BDB2A4]/20 rounded-lg p-3 outline-none focus:border-primary transition-all duration-300 shadow-sm text-[#17140F]">

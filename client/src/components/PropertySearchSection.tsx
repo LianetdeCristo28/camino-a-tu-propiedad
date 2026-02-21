@@ -1,37 +1,122 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { Search, MapPin } from "lucide-react";
+import { Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { LeadCaptureModal } from "@/components/LeadCaptureModal";
+
+const cities = ["Miami", "Orlando", "Tampa", "Jacksonville", "Fort Lauderdale", "Otra"];
+const prices = ["$200K", "$300K", "$400K", "$500K", "$750K", "$1M+"];
+const bedrooms = ["1", "2", "3", "4", "5+"];
 
 export const PropertySearchSection = () => {
+  const [city, setCity] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
+  const [beds, setBeds] = useState("");
+  const [leadOpen, setLeadOpen] = useState(false);
+
+  const goToIDX = () => {
+    // TODO: window.open('URL_LOFTY_IDX', '_blank');
+    console.log("goToIDX: redirigir a portal IDX", { city, maxPrice, beds });
+  };
+
+  const handleSearch = () => {
+    setLeadOpen(true);
+  };
+
+  const handleLeadClose = (open: boolean) => {
+    if (!open) {
+      goToIDX();
+    }
+    setLeadOpen(open);
+  };
+
+  const selectClass = "bg-white border border-[#BDB2A4]/20 rounded-lg p-4 outline-none focus:border-primary transition-all duration-300 text-[#17140F] text-sm w-full appearance-none cursor-pointer";
+
   return (
-    <section id="buscar" className="py-24 bg-[#E5E1D8]">
-      <div className="max-w-4xl mx-auto px-6 text-center">
-        <h2 className="text-3xl md:text-4xl font-serif font-bold text-[#17140F] mb-6">
-          Explora propiedades en tiempo real
-        </h2>
-        <p className="text-lg text-muted-foreground mb-10">
-          Conectado directamente al MLS (Multiple Listing Service) local para que no te pierdas ninguna oportunidad.
-        </p>
-        
-        <motion.div 
+    <section id="buscar" className="py-24 bg-[#F8F6F2]">
+      <div className="max-w-5xl mx-auto px-6">
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="bg-white p-3 rounded-full shadow-sm flex items-center gap-2 max-w-2xl mx-auto border border-[#BDB2A4]/20 transition-all duration-300 hover:shadow-md"
+          className="text-center mb-12"
         >
-          <div className="bg-[#F8F6F2] p-3 rounded-full text-muted-foreground ml-1 hidden sm:block">
-            <MapPin className="w-5 h-5" />
-          </div>
-          <input 
-            type="text" 
-            placeholder="Ciudad, código postal, o vecindario..." 
-            className="flex-1 bg-transparent border-none outline-none text-[#17140F] px-4 text-lg w-full"
-          />
-          <button className="bg-primary text-primary-foreground p-4 md:px-8 rounded-full hover:bg-primary/90 transition-all duration-300 font-bold flex items-center gap-2">
-            <Search className="w-5 h-5" />
-            <span className="hidden sm:inline">Buscar</span>
-          </button>
+          <span className="text-primary font-bold tracking-widest uppercase text-sm mb-4 block">Buscar</span>
+          <h2 className="text-4xl md:text-5xl font-serif font-bold text-[#17140F] mb-6">
+            Propiedades Activas en Florida
+          </h2>
+          <p className="text-xl text-muted-foreground">
+            Accede a listados actualizados con datos reales del mercado.
+          </p>
         </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-[#BDB2A4]/20"
+        >
+          <div className="grid md:grid-cols-3 gap-4 mb-6">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-[#17140F]">Ciudad</label>
+              <select
+                data-testid="select-search-city"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                className={selectClass}
+              >
+                <option value="">Seleccionar ciudad</option>
+                {cities.map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-[#17140F]">Precio máximo</label>
+              <select
+                data-testid="select-search-price"
+                value={maxPrice}
+                onChange={(e) => setMaxPrice(e.target.value)}
+                className={selectClass}
+              >
+                <option value="">Seleccionar precio</option>
+                {prices.map((p) => (
+                  <option key={p} value={p}>{p}</option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-[#17140F]">Habitaciones</label>
+              <select
+                data-testid="select-search-beds"
+                value={beds}
+                onChange={(e) => setBeds(e.target.value)}
+                className={selectClass}
+              >
+                <option value="">Seleccionar</option>
+                {bedrooms.map((b) => (
+                  <option key={b} value={b}>{b}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <Button
+            data-testid="button-buscar-propiedades"
+            onClick={handleSearch}
+            className="w-full bg-[#D2B463] text-[#17140F] hover:bg-[#D2B463]/90 text-lg py-6 rounded-full font-bold shadow-lg hover:scale-[1.02] transition-all"
+          >
+            <Search className="w-5 h-5 mr-2" />
+            Buscar Propiedades Activas
+          </Button>
+        </motion.div>
+
+        <p className="text-center text-xs text-muted-foreground italic mt-6">
+          Conectado a base de datos MLS activa
+        </p>
       </div>
+
+      <LeadCaptureModal open={leadOpen} onOpenChange={handleLeadClose} context="busqueda" />
     </section>
   );
 };
