@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, Loader2 } from "lucide-react";
@@ -17,7 +17,12 @@ export const LeadCaptureModal = ({ open, onOpenChange, context }: LeadCaptureMod
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [interest, setInterest] = useState(defaultInterest);
+  const [propertyAddress, setPropertyAddress] = useState("");
   const [submitted, setSubmitted] = useState(false);
+
+  useEffect(() => {
+    setInterest(defaultInterest);
+  }, [context, defaultInterest]);
 
   const mutation = useMutation({
     mutationFn: async (data: { name: string; phone: string; email: string; interest: string; source: string }) => {
@@ -31,7 +36,10 @@ export const LeadCaptureModal = ({ open, onOpenChange, context }: LeadCaptureMod
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    mutation.mutate({ name, phone, email, interest, source: "contact_form" });
+    const finalInterest = context === "vendedor" && propertyAddress
+      ? `${interest} | Dirección: ${propertyAddress}`
+      : interest;
+    mutation.mutate({ name, phone, email, interest: finalInterest, source: "contact_form" });
   };
 
   const handleClose = (val: boolean) => {
@@ -42,6 +50,7 @@ export const LeadCaptureModal = ({ open, onOpenChange, context }: LeadCaptureMod
         setPhone("");
         setEmail("");
         setInterest(defaultInterest);
+        setPropertyAddress("");
         setSubmitted(false);
         mutation.reset();
       }, 300);
@@ -52,9 +61,13 @@ export const LeadCaptureModal = ({ open, onOpenChange, context }: LeadCaptureMod
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-md bg-[#F8F6F2] border border-[#BDB2A4]/20 p-0 overflow-hidden shadow-lg rounded-2xl">
         <div className="bg-[#17140F] p-6 text-[#F8F6F2] text-center">
-            <DialogTitle className="text-2xl font-serif font-bold text-white">Hablemos de tus metas</DialogTitle>
+            <DialogTitle className="text-2xl font-serif font-bold text-white">
+              {context === "vendedor" ? "Solicita tu Análisis CMA" : "Hablemos de tus metas"}
+            </DialogTitle>
             <DialogDescription className="text-white/70 mt-2">
-              Déjanos tus datos y nos comunicaremos contigo en menos de 24 horas.
+              {context === "vendedor"
+                ? "Recibe una evaluación gratuita del valor de tu propiedad."
+                : "Déjanos tus datos y nos comunicaremos contigo en menos de 24 horas."}
             </DialogDescription>
         </div>
         <div className="p-8">
@@ -83,20 +96,28 @@ export const LeadCaptureModal = ({ open, onOpenChange, context }: LeadCaptureMod
                 <label className="text-sm font-medium text-[#17140F]">Correo electrónico</label>
                 <input data-testid="input-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full bg-white border border-[#BDB2A4]/20 rounded-lg p-3 outline-none focus:border-primary transition-all duration-300 shadow-sm" placeholder="correo@ejemplo.com" required />
               </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-[#17140F]">¿En qué te podemos ayudar?</label>
-                <select data-testid="select-interest" value={interest} onChange={(e) => setInterest(e.target.value)} className="w-full bg-white border border-[#BDB2A4]/20 rounded-lg p-3 outline-none focus:border-primary transition-all duration-300 shadow-sm text-[#17140F]">
-                  <option>Quiero comprar</option>
-                  <option>Quiero vender</option>
-                  <option>Busco invertir</option>
-                  <option>Otra consulta</option>
-                </select>
-              </div>
+              {context === "vendedor" && (
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-[#17140F]">Dirección de la propiedad</label>
+                  <input data-testid="input-property-address" type="text" value={propertyAddress} onChange={(e) => setPropertyAddress(e.target.value)} className="w-full bg-white border border-[#BDB2A4]/20 rounded-lg p-3 outline-none focus:border-primary transition-all duration-300 shadow-sm" placeholder="123 Main St, Miami, FL" />
+                </div>
+              )}
+              {context !== "vendedor" && context !== "comprador" && context !== "inversionista" && (
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-[#17140F]">¿En qué te podemos ayudar?</label>
+                  <select data-testid="select-interest" value={interest} onChange={(e) => setInterest(e.target.value)} className="w-full bg-white border border-[#BDB2A4]/20 rounded-lg p-3 outline-none focus:border-primary transition-all duration-300 shadow-sm text-[#17140F]">
+                    <option>Quiero comprar</option>
+                    <option>Quiero vender</option>
+                    <option>Busco invertir</option>
+                    <option>Otra consulta</option>
+                  </select>
+                </div>
+              )}
               {mutation.isError && (
                 <p className="text-red-500 text-sm text-center">Hubo un error. Por favor intenta de nuevo.</p>
               )}
               <Button data-testid="button-submit-lead" type="submit" disabled={mutation.isPending} className="w-full bg-primary hover:bg-primary/90 text-[#17140F] font-bold py-6 mt-4 rounded-full text-lg shadow-sm transition-all duration-300">
-                {mutation.isPending ? <><Loader2 className="w-5 h-5 animate-spin mr-2" /> Enviando...</> : "Enviar Solicitud"}
+                {mutation.isPending ? <><Loader2 className="w-5 h-5 animate-spin mr-2" /> Enviando...</> : context === "vendedor" ? "Solicitar Análisis" : "Enviar Solicitud"}
               </Button>
             </form>
           )}
