@@ -1,11 +1,12 @@
-import React, { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { useState } from "react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { CheckCircle2, ArrowRight } from "lucide-react";
+import { CheckCircle2, ArrowRight, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 
 interface DiagnosticModalProps {
   open: boolean;
@@ -47,6 +48,11 @@ export const DiagnosticModal = ({ open, onOpenChange }: DiagnosticModalProps) =>
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [showResult, setShowResult] = useState(false);
+  const [showContactForm, setShowContactForm] = useState(false);
+  const [contactSubmitted, setContactSubmitted] = useState(false);
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
 
   const handleAnswer = (value: string) => {
     setAnswers({ ...answers, [questions[step].id]: value });
@@ -61,17 +67,45 @@ export const DiagnosticModal = ({ open, onOpenChange }: DiagnosticModalProps) =>
   };
 
   const getResult = () => {
-    // Simple heuristic logic
     if (answers.stage === "exploring") return { step: 1, title: "Paso 1: Decisión", msg: "Estás en el inicio. Lo más importante ahora es definir qué quieres realmente." };
     if (answers.budget === "no" || answers.stage === "finance") return { step: 2, title: "Paso 2: Finanzas", msg: "Antes de enamorarte de una casa, necesitamos ver números reales." };
     if (answers.budget === "yes_approved" && answers.stage === "searching") return { step: 5, title: "Paso 5: Búsqueda", msg: "¡Estás listo para la acción! Necesitas una estrategia de búsqueda inteligente." };
     return { step: 4, title: "Paso 4: Estrategia", msg: "Tienes la intención, ahora necesitas el plan para no perder tiempo." };
   };
 
+  const mutation = useMutation({
+    mutationFn: async (data: { name: string; phone: string; email: string; interest: string; source: string; diagnosticStep: number }) => {
+      const res = await apiRequest("POST", "/api/leads", data);
+      return res.json();
+    },
+    onSuccess: () => {
+      setContactSubmitted(true);
+    },
+  });
+
+  const handleContactSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const result = getResult();
+    mutation.mutate({
+      name,
+      phone,
+      email,
+      interest: `Diagnóstico: ${result.title}`,
+      source: "diagnostic",
+      diagnosticStep: result.step,
+    });
+  };
+
   const reset = () => {
     setStep(0);
     setAnswers({});
     setShowResult(false);
+    setShowContactForm(false);
+    setContactSubmitted(false);
+    setName("");
+    setPhone("");
+    setEmail("");
+    mutation.reset();
   };
 
   const result = showResult ? getResult() : null;
@@ -108,6 +142,7 @@ export const DiagnosticModal = ({ open, onOpenChange }: DiagnosticModalProps) =>
               <div className="flex justify-between items-center pt-4">
                 <span className="text-xs text-muted-foreground">Paso {step + 1} de {questions.length}</span>
                 <Button 
+                  data-testid="button-diagnostic-next"
                   onClick={nextStep} 
                   disabled={!answers[questions[step].id]}
                   className="bg-primary text-primary-foreground hover:bg-primary/90"
@@ -115,6 +150,44 @@ export const DiagnosticModal = ({ open, onOpenChange }: DiagnosticModalProps) =>
                   {step === questions.length - 1 ? "Ver Resultado" : "Siguiente"} <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </div>
+            </motion.div>
+          ) : showContactForm ? (
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="space-y-5"
+            >
+              {contactSubmitted ? (
+                <div className="text-center space-y-4 py-4">
+                  <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto text-primary">
+                    <CheckCircle2 className="w-8 h-8" />
+                  </div>
+                  <h3 className="text-xl font-serif font-bold text-[#17140F]">¡Listo!</h3>
+                  <p className="text-[#17140F]/70">Te contactaremos pronto con un plan personalizado para tu {result?.title.toLowerCase()}.</p>
+                </div>
+              ) : (
+                <form onSubmit={handleContactSubmit} className="space-y-4">
+                  <p className="text-sm text-[#17140F]/70 text-center">Déjanos tus datos para recibir orientación personalizada sobre tu <strong>{result?.title}</strong>.</p>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-[#17140F]">Nombre</label>
+                    <input data-testid="input-diagnostic-name" type="text" value={name} onChange={(e) => setName(e.target.value)} className="w-full bg-white border border-[#BDB2A4]/20 rounded-lg p-3 outline-none focus:border-primary transition-all duration-300 shadow-sm" placeholder="Tu nombre" required />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-[#17140F]">Teléfono</label>
+                    <input data-testid="input-diagnostic-phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full bg-white border border-[#BDB2A4]/20 rounded-lg p-3 outline-none focus:border-primary transition-all duration-300 shadow-sm" placeholder="+1 (555) 000-0000" required />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-[#17140F]">Correo electrónico</label>
+                    <input data-testid="input-diagnostic-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full bg-white border border-[#BDB2A4]/20 rounded-lg p-3 outline-none focus:border-primary transition-all duration-300 shadow-sm" placeholder="correo@ejemplo.com" required />
+                  </div>
+                  {mutation.isError && (
+                    <p className="text-red-500 text-sm text-center">Hubo un error. Por favor intenta de nuevo.</p>
+                  )}
+                  <Button data-testid="button-diagnostic-submit" type="submit" disabled={mutation.isPending} className="w-full bg-primary hover:bg-primary/90 text-[#17140F] font-bold py-5 rounded-full text-lg shadow-sm transition-all duration-300">
+                    {mutation.isPending ? <><Loader2 className="w-5 h-5 animate-spin mr-2" /> Enviando...</> : "Recibir mi plan"}
+                  </Button>
+                </form>
+              )}
             </motion.div>
           ) : (
              <motion.div
@@ -136,7 +209,11 @@ export const DiagnosticModal = ({ open, onOpenChange }: DiagnosticModalProps) =>
                 <p className="text-sm opacity-90">Agendar una llamada de claridad de 15 minutos para trazar tu {result?.title.toLowerCase()}.</p>
               </div>
 
-              <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 text-lg py-6 shadow-lg shadow-primary/20">
+              <Button
+                data-testid="button-diagnostic-cta"
+                onClick={() => setShowContactForm(true)}
+                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 text-lg py-6 shadow-lg shadow-primary/20"
+              >
                 Hablar con un Experto
               </Button>
             </motion.div>
