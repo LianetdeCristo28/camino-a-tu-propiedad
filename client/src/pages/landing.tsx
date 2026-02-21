@@ -25,9 +25,10 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground font-sans overflow-x-hidden pt-16">
+    <>
       <Navbar />
-      {/* 1) HERO SECTION */}
+      <main className="min-h-screen bg-background text-foreground font-sans overflow-x-hidden pt-16">
+        {/* 1) HERO SECTION */}
       <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
         {/* Background Image with Overlay */}
         <div className="absolute inset-0 z-0">
@@ -247,6 +248,7 @@ export default function LandingPage() {
           ¿En qué paso estoy?
         </Button>
       </motion.div>
-    </div>
+    </main>
+    </>
   );
 }
