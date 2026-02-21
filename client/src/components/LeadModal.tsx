@@ -40,7 +40,7 @@ const contextTitles: Record<string, { title: string; desc: string }> = {
 const inputClass = "w-full bg-white border border-[#BDB2A4]/20 rounded-lg p-3 outline-none focus:border-[#D2B463] transition-all duration-300 shadow-sm text-[#17140F] text-sm";
 
 export const LeadModal = ({ open, onOpenChange, context = "general" }: LeadModalProps) => {
-  const [name, setName] = useState("");
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [city, setCity] = useState("");
@@ -82,23 +82,15 @@ export const LeadModal = ({ open, onOpenChange, context = "general" }: LeadModal
     }
     setEmailError("");
 
-    const interestMap: Record<string, string> = {
-      comprador: "Quiero comprar",
-      vendedor: "Quiero vender",
-      inversionista: "Busco invertir",
-      realtor: "Soy Realtor",
-    };
-
     mutation.mutate({
-      name,
+      fullName,
       email,
       phone: phone || null,
-      interest: interestMap[profileType] || "Consulta general",
       source: context === "general" ? "lead_modal" : `lead_modal_${context}`,
       city: city || null,
       budget: budget || null,
       bedrooms: bedrooms || null,
-      pool,
+      pool: pool ? "si" : "no",
       profileType: profileType || null,
       propertyAddress: propertyAddress || null,
       message: message || null,
@@ -106,7 +98,7 @@ export const LeadModal = ({ open, onOpenChange, context = "general" }: LeadModal
   };
 
   const reset = () => {
-    setName("");
+    setFullName("");
     setEmail("");
     setPhone("");
     setCity("");
@@ -163,8 +155,8 @@ export const LeadModal = ({ open, onOpenChange, context = "general" }: LeadModal
                 <input
                   data-testid="input-lead-name"
                   type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
                   className={inputClass}
                   placeholder="Tu nombre completo"
                   required

@@ -74,7 +74,7 @@ export const DiagnosticModal = ({ open, onOpenChange }: DiagnosticModalProps) =>
   };
 
   const mutation = useMutation({
-    mutationFn: async (data: { name: string; phone: string; email: string; interest: string; source: string; diagnosticStep: number }) => {
+    mutationFn: async (data: Record<string, unknown>) => {
       const res = await apiRequest("POST", "/api/leads", data);
       return res.json();
     },
@@ -87,12 +87,12 @@ export const DiagnosticModal = ({ open, onOpenChange }: DiagnosticModalProps) =>
     e.preventDefault();
     const result = getResult();
     mutation.mutate({
-      name,
+      fullName: name,
       phone,
       email,
-      interest: `Diagnóstico: ${result.title}`,
       source: "diagnostic",
-      diagnosticStep: result.step,
+      profileType: "comprador",
+      message: `Diagnóstico: ${result.title} (Paso ${result.step})`,
     });
   };
 
