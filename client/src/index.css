@@ -3,6 +3,17 @@
 
 @custom-variant dark (&:is(.dark *));
 
+:root {
+  --bg-primary: #F8F6F2;
+  --bg-soft: #E5E1D8;
+  --neutral-accent: #BDB2A4;
+  --warm-accent: #CBB29B;
+  --text-primary: #17140F;
+  --luxury-gold: #D2B463;
+  --white: #FFFFFF;
+  --shadow-soft: rgba(23, 20, 15, 0.08);
+}
+
 @theme inline {
   --font-sans: "DM Sans", sans-serif;
   --font-serif: "Playfair Display", serif;

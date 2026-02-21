@@ -1,24 +1,32 @@
 import React, { useState } from "react";
 import { Staircase } from "@/components/Staircase";
 import { DiagnosticModal } from "@/components/DiagnosticModal";
+import { LeadCaptureModal } from "@/components/LeadCaptureModal";
+import { Nav } from "@/components/Nav";
+import { VendedoresSection } from "@/components/VendedoresSection";
+import { InversionistasSection } from "@/components/InversionistasSection";
+import { RealtorsIASection } from "@/components/RealtorsIASection";
+import { PropertySearchSection } from "@/components/PropertySearchSection";
+import { Footer } from "@/components/Footer";
+import { ChatbotAna } from "@/components/ChatbotAna";
 import { Button } from "@/components/ui/button";
 import { ArrowDown, Check, Star } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function LandingPage() {
-  const [modalOpen, setModalOpen] = useState(false);
+  const [diagnosticOpen, setDiagnosticOpen] = useState(false);
+  const [leadModalOpen, setLeadModalOpen] = useState(false);
 
   const scrollToSteps = () => {
     const element = document.getElementById('core-path');
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
-      // Optional: open modal after a slight delay if they clicked "Discover your step"
-      // setTimeout(() => setModalOpen(true), 1000); 
     }
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground font-sans overflow-x-hidden">
+    <div className="min-h-screen bg-background text-foreground font-sans overflow-x-hidden pt-16">
+      <Nav />
       {/* 1) HERO SECTION */}
       <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
         {/* Background Image with Overlay */}
@@ -40,7 +48,7 @@ export default function LandingPage() {
             className="space-y-8"
           >
             <div className="inline-block px-4 py-1.5 rounded-full bg-[#E5E1D8] text-[#17140F] text-sm font-medium tracking-wide">
-              Guía Exclusiva Para Compradores
+              Bienes Raíces de Alto Nivel
             </div>
             
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-serif font-bold text-[#17140F] leading-[1.1] text-balance">
@@ -48,22 +56,22 @@ export default function LandingPage() {
             </h1>
             
             <p className="text-lg text-muted-foreground/80 leading-relaxed max-w-xl text-balance">
-              Comprar una propiedad no es difícil por falta de oportunidades. Es difícil porque nadie te muestra el paso a paso con claridad.
+              Comprar, vender o invertir no es difícil por falta de opciones. Es difícil cuando no tienes a un experto guiándote paso a paso con claridad.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <Button 
-                onClick={() => setModalOpen(true)}
+                onClick={() => setDiagnosticOpen(true)}
                 className="bg-primary text-primary-foreground text-lg px-8 py-7 rounded-full shadow-lg shadow-primary/20 hover:scale-105 transition-transform hover:bg-primary/90"
               >
-                👉 Quiero saber en qué paso estoy
+                👉 En qué paso estoy
               </Button>
               <Button 
                 variant="outline" 
-                onClick={scrollToSteps}
+                onClick={() => setLeadModalOpen(true)}
                 className="text-foreground border-[#BDB2A4] text-lg px-8 py-7 rounded-full hover:bg-[#E5E1D8]"
               >
-                Ver el mapa completo
+                Contactar a Lianet
               </Button>
             </div>
 
@@ -82,6 +90,9 @@ export default function LandingPage() {
           <ArrowDown className="w-6 h-6" />
         </div>
       </section>
+
+      {/* Property Search Section */}
+      <PropertySearchSection />
 
       {/* 2) PROBLEM SECTION */}
       <section className="py-24 bg-[#E5E1D8]">
@@ -195,7 +206,7 @@ export default function LandingPage() {
           
           <div className="flex flex-col items-center gap-6">
             <Button 
-              onClick={() => setModalOpen(true)}
+              onClick={() => setDiagnosticOpen(true)}
               className="bg-primary hover:bg-primary/90 text-primary-foreground text-xl px-12 py-8 rounded-full shadow-lg shadow-primary/20 hover:scale-105 transition-all w-full md:w-auto"
             >
               🟡 Descubre tu próximo paso
@@ -205,19 +216,33 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* NEW SECTIONS */}
+      <VendedoresSection />
+      <InversionistasSection />
+      <RealtorsIASection />
+
+      {/* Footer */}
+      <Footer />
+
       {/* Diagnostic Modal */}
-      <DiagnosticModal open={modalOpen} onOpenChange={setModalOpen} />
+      <DiagnosticModal open={diagnosticOpen} onOpenChange={setDiagnosticOpen} />
       
+      {/* Lead Capture Modal */}
+      <LeadCaptureModal open={leadModalOpen} onOpenChange={setLeadModalOpen} />
+
+      {/* Chatbot */}
+      <ChatbotAna />
+
       {/* Floating CTA for Mobile */}
       <motion.div 
         initial={{ y: 100 }}
         animate={{ y: 0 }}
         transition={{ delay: 2 }}
-        className="fixed bottom-6 left-6 right-6 z-50 md:hidden"
+        className="fixed bottom-6 left-6 right-6 z-40 md:hidden pointer-events-none"
       >
         <Button 
-          onClick={() => setModalOpen(true)}
-          className="w-full bg-primary text-primary-foreground shadow-xl py-6 rounded-full font-bold"
+          onClick={() => setDiagnosticOpen(true)}
+          className="w-full bg-[#17140F] text-white shadow-xl py-6 rounded-full font-bold pointer-events-auto"
         >
           ¿En qué paso estoy?
         </Button>
