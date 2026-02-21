@@ -116,18 +116,58 @@ const RedirectTransition = ({ city, loftyUrl }: { city: string; loftyUrl: string
       ? 100
       : ((completedStages.length + stageProgress / 100) / stages.length) * 100;
 
+  if (phase === "redirecting") {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5, ease: [0.34, 1.56, 0.64, 1] as [number, number, number, number] }}
+        className="text-center space-y-6 py-4"
+      >
+        <div className="w-16 h-16 bg-[#17140F] rounded-2xl flex items-center justify-center mx-auto shadow-[0_0_30px_rgba(210,180,99,0.25)]">
+          <KeyRound className="w-8 h-8 text-[#D2B463]" />
+        </div>
+
+        <div>
+          <h3 className="text-2xl font-serif font-bold text-[#17140F]">
+            Tu búsqueda está lista
+          </h3>
+          <p className="text-[#BDB2A4] mt-2">
+            Encontramos propiedades en {city || "Florida"} que coinciden con tus criterios
+          </p>
+        </div>
+
+        <a
+          href={loftyUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          data-testid="link-ver-propiedades"
+          className="inline-flex items-center justify-center gap-3 w-full bg-[#D2B463] text-[#17140F] font-bold text-lg px-8 py-5 rounded-full hover:bg-[#D2B463]/90 hover:scale-[1.02] transition-all shadow-lg shadow-[#D2B463]/25 no-underline"
+        >
+          Ver Mis Propiedades
+          <ArrowUpRight className="w-5 h-5" />
+        </a>
+
+        <div className="flex items-center justify-center gap-2 text-xs text-[#BDB2A4]">
+          <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
+          Stellar MLS · Datos verificados en tiempo real
+        </div>
+      </motion.div>
+    );
+  }
+
   return (
     <div className="py-2">
       <div className="text-center mb-6">
         <motion.div
           {...scaleIn}
           className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5 transition-all duration-500 ${
-            phase === "complete" || phase === "redirecting"
+            phase === "complete"
               ? "bg-[#17140F] text-[#D2B463] shadow-[0_0_30px_rgba(210,180,99,0.25)]"
               : "bg-gradient-to-br from-[#F8F6F2] to-[#E5E1D8] text-[#17140F]"
           }`}
         >
-          {phase === "complete" || phase === "redirecting" ? (
+          {phase === "complete" ? (
             <KeyRound className="w-7 h-7" />
           ) : (
             <Loader2 className="w-7 h-7 animate-spin" />
@@ -135,12 +175,10 @@ const RedirectTransition = ({ city, loftyUrl }: { city: string; loftyUrl: string
         </motion.div>
 
         <h3 className="text-xl font-serif font-bold text-[#17140F] mb-1">
-          {phase === "redirecting" ? "¡Listo!" : phase === "complete" ? "Búsqueda personalizada lista" : "Preparando tu búsqueda"}
+          {phase === "complete" ? "Búsqueda personalizada lista" : "Preparando tu búsqueda"}
         </h3>
         <p className="text-sm text-[#BDB2A4]">
-          {phase === "redirecting"
-            ? "Abriendo tus propiedades…"
-            : phase === "complete"
+          {phase === "complete"
             ? `Propiedades en ${city || "Florida"}`
             : "Conectando con el mercado de Florida en tiempo real"}
         </p>
@@ -155,106 +193,71 @@ const RedirectTransition = ({ city, loftyUrl }: { city: string; loftyUrl: string
         />
       </div>
 
-      <AnimatePresence mode="wait">
-        {phase !== "redirecting" ? (
-          <motion.div key="stages" className="space-y-1.5" {...fadeSlideUp}>
-            {stages.map((stage, i) => {
-              const isCompleted = completedStages.includes(i);
-              const isActive = currentStage === i && phase === "loading";
-              const isPending = !isCompleted && !isActive;
+      <div className="space-y-1.5">
+        {stages.map((stage, i) => {
+          const isCompleted = completedStages.includes(i);
+          const isActive = currentStage === i && phase === "loading";
+          const isPending = !isCompleted && !isActive;
 
-              return (
-                <motion.div
-                  key={i}
-                  initial={isActive ? { opacity: 0, y: 12 } : false}
-                  animate={{ opacity: isPending && phase === "loading" ? 0.35 : 1, y: 0 }}
-                  transition={{ duration: 0.4 }}
-                  className={`flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl transition-all duration-400 ${
-                    isActive ? "bg-[#F8F6F2]" : ""
-                  }`}
-                >
-                  <div
-                    className={`w-8 h-8 rounded-[10px] flex items-center justify-center flex-shrink-0 transition-all duration-300 ${
-                      isCompleted
-                        ? "bg-[#17140F] text-[#D2B463]"
-                        : isActive
-                        ? "bg-[#E5E1D8] text-[#17140F]"
-                        : "bg-[#F5F3EF] text-[#BDB2A4]"
-                    }`}
-                  >
-                    {isCompleted ? (
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ type: "spring", stiffness: 500, damping: 15 }}
-                      >
-                        <CheckCircle2 className="w-4 h-4" />
-                      </motion.div>
-                    ) : (
-                      stage.icon
-                    )}
-                  </div>
-
-                  <span
-                    className={`text-sm flex-1 transition-all duration-300 ${
-                      isCompleted || isActive ? "text-[#17140F] font-medium" : "text-[#BDB2A4]"
-                    }`}
-                  >
-                    {stage.label}
-                  </span>
-
-                  {isActive && (
-                    <div className="w-12 h-[3px] rounded-full bg-[#E5E1D8] overflow-hidden">
-                      <motion.div
-                        className="h-full bg-[#D2B463] rounded-full"
-                        initial={{ width: "0%" }}
-                        animate={{ width: `${stageProgress}%` }}
-                        transition={{ duration: 0.05, ease: "linear" }}
-                      />
-                    </div>
-                  )}
-                </motion.div>
-              );
-            })}
-          </motion.div>
-        ) : (
-          <motion.div
-            key="redirecting"
-            {...scaleIn}
-            className="text-center py-3"
-          >
-            <a
-              href={loftyUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              data-testid="link-ver-propiedades"
+          return (
+            <motion.div
+              key={i}
+              initial={isActive ? { opacity: 0, y: 12 } : false}
+              animate={{ opacity: isPending && phase === "loading" ? 0.35 : 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+              className={`flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl transition-all ${
+                isActive ? "bg-[#F8F6F2]" : ""
+              }`}
             >
-              <motion.div
-                animate={{ y: [0, -8, 0] }}
-                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                className="inline-flex items-center gap-2.5 bg-[#17140F] text-[#F8F6F2] px-7 py-3.5 rounded-full text-sm font-medium cursor-pointer hover:bg-[#17140F]/90 transition-colors"
+              <div
+                className={`w-8 h-8 rounded-[10px] flex items-center justify-center flex-shrink-0 transition-all duration-300 ${
+                  isCompleted
+                    ? "bg-[#17140F] text-[#D2B463]"
+                    : isActive
+                    ? "bg-[#E5E1D8] text-[#17140F]"
+                    : "bg-[#F5F3EF] text-[#BDB2A4]"
+                }`}
               >
-                <span>Ver propiedades</span>
-                <motion.span
-                  animate={{ x: [0, 3, 0], y: [0, -3, 0] }}
-                  transition={{ duration: 1, repeat: Infinity, ease: "easeInOut" }}
-                  className="inline-flex"
-                >
-                  <ArrowUpRight className="w-4 h-4" />
-                </motion.span>
-              </motion.div>
-            </a>
-            <p className="mt-4 text-xs text-[#BDB2A4]">
-              Toca el botón para abrir tus resultados
-            </p>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                {isCompleted ? (
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", stiffness: 500, damping: 15 }}
+                  >
+                    <CheckCircle2 className="w-4 h-4" />
+                  </motion.div>
+                ) : (
+                  stage.icon
+                )}
+              </div>
+
+              <span
+                className={`text-sm flex-1 transition-all duration-300 ${
+                  isCompleted || isActive ? "text-[#17140F] font-medium" : "text-[#BDB2A4]"
+                }`}
+              >
+                {stage.label}
+              </span>
+
+              {isActive && (
+                <div className="w-12 h-[3px] rounded-full bg-[#E5E1D8] overflow-hidden">
+                  <motion.div
+                    className="h-full bg-[#D2B463] rounded-full"
+                    initial={{ width: "0%" }}
+                    animate={{ width: `${stageProgress}%` }}
+                    transition={{ duration: 0.05, ease: "linear" }}
+                  />
+                </div>
+              )}
+            </motion.div>
+          );
+        })}
+      </div>
 
       <div className="mt-6 pt-3.5 border-t border-[#BDB2A4]/15 flex items-center justify-center gap-2">
         <div
           className={`w-1.5 h-1.5 rounded-full transition-colors duration-300 ${
-            phase === "complete" || phase === "redirecting" ? "bg-green-400" : "bg-[#D2B463]"
+            phase === "complete" ? "bg-green-400" : "bg-[#D2B463]"
           }`}
         />
         <span className="text-[11px] text-[#BDB2A4] tracking-wide">
