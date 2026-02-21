@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -63,7 +63,7 @@ const scaleIn = {
   transition: { duration: 0.5, ease: [0.34, 1.56, 0.64, 1] as [number, number, number, number] },
 };
 
-const RedirectTransition = ({ city, onComplete }: { city: string; onComplete: () => void }) => {
+const RedirectTransition = ({ city, loftyUrl }: { city: string; loftyUrl: string }) => {
   const [phase, setPhase] = useState<RedirectPhase>("loading");
   const [currentStage, setCurrentStage] = useState(0);
   const [stageProgress, setStageProgress] = useState(0);
@@ -84,7 +84,6 @@ const RedirectTransition = ({ city, onComplete }: { city: string; onComplete: ()
       setPhase("complete");
       const t = setTimeout(() => {
         setPhase("redirecting");
-        onComplete();
       }, 1200);
       return () => clearTimeout(t);
     }
@@ -224,22 +223,29 @@ const RedirectTransition = ({ city, onComplete }: { city: string; onComplete: ()
             {...scaleIn}
             className="text-center py-3"
           >
-            <motion.div
-              animate={{ y: [0, -8, 0] }}
-              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-              className="inline-flex items-center gap-2.5 bg-[#17140F] text-[#F8F6F2] px-7 py-3.5 rounded-full text-sm font-medium"
+            <a
+              href={loftyUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-testid="link-ver-propiedades"
             >
-              <span>Abriendo propiedades</span>
-              <motion.span
-                animate={{ x: [0, 3, 0], y: [0, -3, 0] }}
-                transition={{ duration: 1, repeat: Infinity, ease: "easeInOut" }}
-                className="inline-flex"
+              <motion.div
+                animate={{ y: [0, -8, 0] }}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                className="inline-flex items-center gap-2.5 bg-[#17140F] text-[#F8F6F2] px-7 py-3.5 rounded-full text-sm font-medium cursor-pointer hover:bg-[#17140F]/90 transition-colors"
               >
-                <ArrowUpRight className="w-4 h-4" />
-              </motion.span>
-            </motion.div>
+                <span>Ver propiedades</span>
+                <motion.span
+                  animate={{ x: [0, 3, 0], y: [0, -3, 0] }}
+                  transition={{ duration: 1, repeat: Infinity, ease: "easeInOut" }}
+                  className="inline-flex"
+                >
+                  <ArrowUpRight className="w-4 h-4" />
+                </motion.span>
+              </motion.div>
+            </a>
             <p className="mt-4 text-xs text-[#BDB2A4]">
-              Se abrirá una nueva pestaña con tus resultados
+              Toca el botón para abrir tus resultados
             </p>
           </motion.div>
         )}
@@ -278,7 +284,7 @@ export const LeadModal = ({ open, onOpenChange, context = "general" }: LeadModal
     setProfileType(contextToProfile[context] || "");
   }, [context]);
 
-  const buildLoftyUrl = useCallback(() => {
+  const buildLoftyUrl = () => {
     const cityParam = city || "Orlando";
     const condition: Record<string, unknown> = {
       location: { city: [`${cityParam}, FL`] },
@@ -298,7 +304,7 @@ export const LeadModal = ({ open, onOpenChange, context = "general" }: LeadModal
       condition.beds = `${bedsVal},`;
     }
     return `${LOFTY_BASE_URL}?condition=${encodeURIComponent(JSON.stringify(condition))}`;
-  }, [city, budget, bedrooms]);
+  };
 
   const mutation = useMutation({
     mutationFn: async (data: Record<string, unknown>) => {
@@ -344,12 +350,7 @@ export const LeadModal = ({ open, onOpenChange, context = "general" }: LeadModal
     });
   };
 
-  const handleRedirectComplete = useCallback(() => {
-    const url = buildLoftyUrl();
-    setTimeout(() => {
-      window.open(url, "_blank");
-    }, 1200);
-  }, [buildLoftyUrl]);
+  const loftyUrl = buildLoftyUrl();
 
   const reset = () => {
     setFullName("");
@@ -395,7 +396,7 @@ export const LeadModal = ({ open, onOpenChange, context = "general" }: LeadModal
 
         <div className="p-6 md:p-8">
           {showRedirectTransition ? (
-            <RedirectTransition city={city} onComplete={handleRedirectComplete} />
+            <RedirectTransition city={city} loftyUrl={loftyUrl} />
           ) : submitted ? (
             <div className="text-center space-y-4 py-6">
               <div className="w-16 h-16 bg-[#D2B463]/20 rounded-full flex items-center justify-center mx-auto text-[#D2B463]">
