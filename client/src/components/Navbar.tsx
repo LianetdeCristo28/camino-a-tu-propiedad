@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
 
-export const Navbar = () => {
+export const Navbar = ({ onContactClick }: { onContactClick?: () => void }) => {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -55,6 +55,7 @@ export const Navbar = () => {
           </div>
           
           <Button 
+            onClick={onContactClick}
             className="bg-[#D2B463] text-[#17140F] hover:bg-[#D2B463]/90 font-bold rounded-full px-6 transition-all duration-300"
           >
             Hablar con un Experto
@@ -82,6 +83,7 @@ export const Navbar = () => {
                 </button>
               ))}
               <Button 
+                onClick={onContactClick}
                 className="bg-[#D2B463] text-[#17140F] hover:bg-[#D2B463]/90 font-bold rounded-full py-6 mt-4 w-full text-lg shadow-sm"
               >
                 Hablar con un Experto

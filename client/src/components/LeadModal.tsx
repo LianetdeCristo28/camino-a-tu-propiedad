@@ -12,14 +12,23 @@ import { motion } from "framer-motion";
 
 type LeadContext = "comprador" | "vendedor" | "inversionista" | "busqueda" | "general";
 
+export interface SearchFilters {
+  city?: string;
+  maxPrice?: string;
+  beds?: string;
+}
+
 interface LeadModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   context?: LeadContext;
   onLeadCaptured?: () => void;
+  searchFilters?: SearchFilters;
 }
 
-const cities = ["Miami", "Orlando", "Tampa", "Jacksonville", "Fort Lauderdale", "Otra"];
+const LOFTY_BASE = "https://lianetespinosaojeda.expportal.com";
+
+const cities = ["Miami", "Orlando", "Tampa", "Jacksonville", "Fort Lauderdale", "Kissimmee", "Daytona Beach", "Naples", "Otra"];
 const budgets = ["$100K-200K", "$200K-300K", "$300K-400K", "$400K-500K", "$500K-750K", "$750K-1M", "$1M+"];
 const bedroomOptions = ["1", "2", "3", "4", "5+"];
 
@@ -35,37 +44,66 @@ const contextTitles: Record<string, { title: string; desc: string }> = {
   comprador: { title: "Comienza tu Proceso de Compra", desc: "Cuéntanos sobre tu búsqueda ideal." },
   vendedor: { title: "Solicita tu Análisis CMA", desc: "Recibe una evaluación gratuita del valor de tu propiedad." },
   inversionista: { title: "Evalúa tu Oportunidad", desc: "Comparte los detalles de tu interés de inversión." },
-  busqueda: { title: "Accede a Propiedades Activas", desc: "Déjanos tus datos para enviarte listados personalizados." },
+  busqueda: { title: "Accede a Propiedades Activas", desc: "Déjanos tus datos para ver listados personalizados." },
   general: { title: "Hablemos de tus Metas", desc: "Déjanos tus datos y nos comunicaremos contigo en menos de 24 horas." },
 };
 
 const inputClass = "w-full bg-white border border-[#BDB2A4]/20 rounded-lg p-3 outline-none focus:border-[#D2B463] transition-all duration-300 shadow-sm text-[#17140F] text-sm";
 
-type RedirectPhase = "idle" | "loading" | "complete" | "redirecting";
+// ─── URL Builder ─────────────────────────────────────────────
+function buildLoftyURL(filters: SearchFilters): string {
+  if (!filters.city && !filters.maxPrice && !filters.beds) {
+    return `${LOFTY_BASE}/listing`;
+  }
 
-interface TransitionStage {
-  label: string;
-  icon: React.ReactNode;
-  duration: number;
+  const condition: Record<string, unknown> = {};
+
+  if (filters.city && filters.city !== "Otra") {
+    condition.location = { city: [`${filters.city}, FL`] };
+  }
+  if (filters.maxPrice) {
+    const num = parsePriceToNumber(filters.maxPrice);
+    if (num) condition.price = `,${num}`;
+  }
+  if (filters.beds) {
+    condition.beds = `${filters.beds.replace("+", "")},`;
+  }
+
+  if (Object.keys(condition).length === 0) {
+    return `${LOFTY_BASE}/listing`;
+  }
+
+  const params = new URLSearchParams({
+    listingSource: "all listings",
+    condition: JSON.stringify(condition),
+    uiConfig: "{}",
+    zoom: "13",
+    page: "1",
+  });
+
+  return `${LOFTY_BASE}/listing?${params.toString()}`;
 }
 
-const scaleIn = {
-  initial: { opacity: 0, scale: 0.85 },
-  animate: { opacity: 1, scale: 1 },
-  transition: { duration: 0.5, ease: [0.34, 1.56, 0.64, 1] as [number, number, number, number] },
-};
+function parsePriceToNumber(val: string): string {
+  if (/^\d+$/.test(val)) return val;
+  const parts = val.replace(/\$/g, "").split("-");
+  const maxPart = parts.length > 1 ? parts[1] : parts[0];
+  if (/[Mm]/.test(maxPart)) return String(parseFloat(maxPart.replace(/[^0-9.]/g, "")) * 1000000);
+  if (/[Kk]/.test(maxPart)) return String(parseFloat(maxPart.replace(/[^0-9.]/g, "")) * 1000);
+  return val.replace(/[^0-9]/g, "") || "";
+}
+
+// ─── Redirect Transition ─────────────────────────────────────
+type RedirectPhase = "loading" | "complete";
 
 const RedirectTransition = ({ city, loftyUrl }: { city: string; loftyUrl: string }) => {
-  const urlRef = useRef(loftyUrl);
   const [phase, setPhase] = useState<RedirectPhase>("loading");
   const [currentStage, setCurrentStage] = useState(0);
   const [stageProgress, setStageProgress] = useState(0);
   const [completedStages, setCompletedStages] = useState<number[]>([]);
   const progressInterval = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  console.log("RedirectTransition URL:", urlRef.current);
-
-  const stages: TransitionStage[] = [
+  const stages = [
     { label: "Verificando tu perfil", icon: <Shield className="w-4 h-4" />, duration: 800 },
     { label: "Conectando con Stellar MLS", icon: <Database className="w-4 h-4" />, duration: 1000 },
     { label: `Filtrando propiedades en ${city || "Florida"}`, icon: <Filter className="w-4 h-4" />, duration: 1200 },
@@ -73,15 +111,8 @@ const RedirectTransition = ({ city, loftyUrl }: { city: string; loftyUrl: string
   ];
 
   useEffect(() => {
-    if (phase !== "loading" || currentStage < 0) return;
-
-    if (currentStage >= stages.length) {
-      setPhase("complete");
-      const t = setTimeout(() => {
-        setPhase("redirecting");
-      }, 1200);
-      return () => clearTimeout(t);
-    }
+    if (phase !== "loading") return;
+    if (currentStage >= stages.length) { setPhase("complete"); return; }
 
     const stage = stages[currentStage];
     let progress = 0;
@@ -90,59 +121,33 @@ const RedirectTransition = ({ city, loftyUrl }: { city: string; loftyUrl: string
     progressInterval.current = setInterval(() => {
       progress += step;
       setStageProgress(Math.min(progress, 100));
-
       if (progress >= 100) {
         if (progressInterval.current) clearInterval(progressInterval.current);
         setCompletedStages((prev) => [...prev, currentStage]);
-        setTimeout(() => {
-          setCurrentStage((prev) => prev + 1);
-          setStageProgress(0);
-        }, 200);
+        setTimeout(() => { setCurrentStage((prev) => prev + 1); setStageProgress(0); }, 200);
       }
     }, 30);
 
-    return () => {
-      if (progressInterval.current) clearInterval(progressInterval.current);
-    };
+    return () => { if (progressInterval.current) clearInterval(progressInterval.current); };
   }, [phase, currentStage]);
 
-  const totalProgress =
-    phase === "complete" || phase === "redirecting"
-      ? 100
-      : ((completedStages.length + stageProgress / 100) / stages.length) * 100;
+  const totalProgress = phase === "complete" ? 100 : ((completedStages.length + stageProgress / 100) / stages.length) * 100;
 
-  if (phase === "redirecting") {
+  if (phase === "complete") {
     return (
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5, ease: [0.34, 1.56, 0.64, 1] as [number, number, number, number] }}
-        className="text-center space-y-6 py-4"
-      >
+      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }} className="text-center space-y-6 py-4">
         <div className="w-16 h-16 bg-[#17140F] rounded-2xl flex items-center justify-center mx-auto shadow-[0_0_30px_rgba(210,180,99,0.25)]">
           <KeyRound className="w-8 h-8 text-[#D2B463]" />
         </div>
-
         <div>
-          <h3 className="text-2xl font-serif font-bold text-[#17140F]">
-            Tu búsqueda está lista
-          </h3>
-          <p className="text-[#BDB2A4] mt-2">
-            Encontramos propiedades en {city || "Florida"} que coinciden con tus criterios
-          </p>
+          <h3 className="text-2xl font-serif font-bold text-[#17140F]">Tu búsqueda está lista</h3>
+          <p className="text-[#BDB2A4] mt-2">Propiedades disponibles en {city || "Florida"}</p>
         </div>
-
-        <a
-          href={urlRef.current}
-          target="_blank"
-          rel="noopener noreferrer"
-          data-testid="link-ver-propiedades"
-          className="inline-flex items-center justify-center gap-3 w-full bg-[#D2B463] text-[#17140F] font-bold text-lg px-8 py-5 rounded-full hover:bg-[#D2B463]/90 hover:scale-[1.02] transition-all shadow-lg shadow-[#D2B463]/25 no-underline"
-        >
-          Ver Mis Propiedades
-          <ArrowUpRight className="w-5 h-5" />
+        <a href={loftyUrl} target="_blank" rel="noopener noreferrer" data-testid="link-ver-propiedades"
+          className="inline-flex items-center justify-center gap-3 w-full bg-[#D2B463] text-[#17140F] font-bold text-lg px-8 py-5 rounded-full hover:bg-[#D2B463]/90 hover:scale-[1.02] transition-all shadow-lg shadow-[#D2B463]/25 no-underline">
+          Ver Mis Propiedades <ArrowUpRight className="w-5 h-5" />
         </a>
-
+        <p className="text-xs text-[#BDB2A4]">Se abrirá tu portal de propiedades en una nueva pestaña</p>
         <div className="flex items-center justify-center gap-2 text-xs text-[#BDB2A4]">
           <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
           Stellar MLS · Datos verificados en tiempo real
@@ -154,160 +159,47 @@ const RedirectTransition = ({ city, loftyUrl }: { city: string; loftyUrl: string
   return (
     <div className="py-2">
       <div className="text-center mb-6">
-        <motion.div
-          {...scaleIn}
-          className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5 transition-all duration-500 ${
-            phase === "complete"
-              ? "bg-[#17140F] text-[#D2B463] shadow-[0_0_30px_rgba(210,180,99,0.25)]"
-              : "bg-gradient-to-br from-[#F8F6F2] to-[#E5E1D8] text-[#17140F]"
-          }`}
-        >
-          {phase === "complete" ? (
-            <KeyRound className="w-7 h-7" />
-          ) : (
-            <Loader2 className="w-7 h-7 animate-spin" />
-          )}
+        <motion.div initial={{ opacity: 0, scale: 0.85 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }}
+          className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5 bg-gradient-to-br from-[#F8F6F2] to-[#E5E1D8] text-[#17140F]">
+          <Loader2 className="w-7 h-7 animate-spin" />
         </motion.div>
-
-        <h3 className="text-xl font-serif font-bold text-[#17140F] mb-1">
-          {phase === "complete" ? "Búsqueda personalizada lista" : "Preparando tu búsqueda"}
-        </h3>
-        <p className="text-sm text-[#BDB2A4]">
-          {phase === "complete"
-            ? `Propiedades en ${city || "Florida"}`
-            : "Conectando con el mercado de Florida en tiempo real"}
-        </p>
+        <h3 className="text-xl font-serif font-bold text-[#17140F] mb-1">Preparando tu búsqueda</h3>
+        <p className="text-sm text-[#BDB2A4]">Conectando con el mercado de Florida en tiempo real</p>
       </div>
-
       <div className="h-1 rounded-full bg-[#F0EDE8] mb-6 overflow-hidden">
-        <motion.div
-          className="h-full rounded-full bg-gradient-to-r from-[#D2B463] to-[#CBB29B]"
-          initial={{ width: "0%" }}
-          animate={{ width: `${totalProgress}%` }}
-          transition={{ duration: 0.3, ease: "easeOut" }}
-        />
+        <motion.div className="h-full rounded-full bg-gradient-to-r from-[#D2B463] to-[#CBB29B]" initial={{ width: "0%" }} animate={{ width: `${totalProgress}%` }} transition={{ duration: 0.3 }} />
       </div>
-
       <div className="space-y-1.5">
         {stages.map((stage, i) => {
           const isCompleted = completedStages.includes(i);
           const isActive = currentStage === i && phase === "loading";
           const isPending = !isCompleted && !isActive;
-
           return (
-            <motion.div
-              key={i}
-              initial={isActive ? { opacity: 0, y: 12 } : false}
-              animate={{ opacity: isPending && phase === "loading" ? 0.35 : 1, y: 0 }}
-              transition={{ duration: 0.4 }}
-              className={`flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl transition-all ${
-                isActive ? "bg-[#F8F6F2]" : ""
-              }`}
-            >
-              <div
-                className={`w-8 h-8 rounded-[10px] flex items-center justify-center flex-shrink-0 transition-all duration-300 ${
-                  isCompleted
-                    ? "bg-[#17140F] text-[#D2B463]"
-                    : isActive
-                    ? "bg-[#E5E1D8] text-[#17140F]"
-                    : "bg-[#F5F3EF] text-[#BDB2A4]"
-                }`}
-              >
-                {isCompleted ? (
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ type: "spring", stiffness: 500, damping: 15 }}
-                  >
-                    <CheckCircle2 className="w-4 h-4" />
-                  </motion.div>
-                ) : (
-                  stage.icon
-                )}
+            <motion.div key={i} initial={isActive ? { opacity: 0, y: 12 } : false} animate={{ opacity: isPending ? 0.35 : 1, y: 0 }} transition={{ duration: 0.4 }}
+              className={`flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl transition-all ${isActive ? "bg-[#F8F6F2]" : ""}`}>
+              <div className={`w-8 h-8 rounded-[10px] flex items-center justify-center flex-shrink-0 transition-all duration-300 ${isCompleted ? "bg-[#17140F] text-[#D2B463]" : isActive ? "bg-[#E5E1D8] text-[#17140F]" : "bg-[#F5F3EF] text-[#BDB2A4]"}`}>
+                {isCompleted ? <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 500, damping: 15 }}><CheckCircle2 className="w-4 h-4" /></motion.div> : stage.icon}
               </div>
-
-              <span
-                className={`text-sm flex-1 transition-all duration-300 ${
-                  isCompleted || isActive ? "text-[#17140F] font-medium" : "text-[#BDB2A4]"
-                }`}
-              >
-                {stage.label}
-              </span>
-
+              <span className={`text-sm flex-1 transition-all duration-300 ${isCompleted || isActive ? "text-[#17140F] font-medium" : "text-[#BDB2A4]"}`}>{stage.label}</span>
               {isActive && (
                 <div className="w-12 h-[3px] rounded-full bg-[#E5E1D8] overflow-hidden">
-                  <motion.div
-                    className="h-full bg-[#D2B463] rounded-full"
-                    initial={{ width: "0%" }}
-                    animate={{ width: `${stageProgress}%` }}
-                    transition={{ duration: 0.05, ease: "linear" }}
-                  />
+                  <motion.div className="h-full bg-[#D2B463] rounded-full" initial={{ width: "0%" }} animate={{ width: `${stageProgress}%` }} transition={{ duration: 0.05 }} />
                 </div>
               )}
             </motion.div>
           );
         })}
       </div>
-
       <div className="mt-6 pt-3.5 border-t border-[#BDB2A4]/15 flex items-center justify-center gap-2">
-        <div
-          className={`w-1.5 h-1.5 rounded-full transition-colors duration-300 ${
-            phase === "complete" ? "bg-green-400" : "bg-[#D2B463]"
-          }`}
-        />
-        <span className="text-[11px] text-[#BDB2A4] tracking-wide">
-          Stellar MLS · Datos verificados en tiempo real
-        </span>
+        <div className="w-1.5 h-1.5 rounded-full bg-[#D2B463]" />
+        <span className="text-[11px] text-[#BDB2A4] tracking-wide">Stellar MLS · Datos verificados en tiempo real</span>
       </div>
     </div>
   );
 };
 
-function buildLoftyURL(filters: { city?: string; maxPrice?: string; beds?: string }): string {
-  const base = "https://lianetespinosaojeda.expportal.com";
-
-  if (!filters.city && !filters.maxPrice && !filters.beds) {
-    return `${base}/listing`;
-  }
-
-  const condition: Record<string, unknown> = {};
-
-  if (filters.city && filters.city !== "Otra") {
-    condition.location = { city: [`${filters.city}, FL`] };
-  }
-
-  if (filters.maxPrice) {
-    condition.price = `,${filters.maxPrice}`;
-  }
-
-  if (filters.beds) {
-    condition.beds = `${filters.beds},`;
-  }
-
-  const params = new URLSearchParams({
-    listingSource: "all listings",
-    condition: JSON.stringify(condition),
-    uiConfig: "{}",
-    zoom: "13",
-    page: "1",
-  });
-
-  return `${base}/listing?${params.toString()}`;
-}
-
-function parseBudgetToNumber(budget: string): string {
-  const parts = budget.replace(/\$/g, "").split("-");
-  const maxPart = parts.length > 1 ? parts[1] : parts[0];
-  if (maxPart.includes("M") || maxPart.includes("m")) {
-    return String(parseFloat(maxPart.replace(/[^0-9.]/g, "")) * 1000000);
-  }
-  if (maxPart.includes("K") || maxPart.includes("k")) {
-    return String(parseFloat(maxPart.replace(/[^0-9.]/g, "")) * 1000);
-  }
-  return "";
-}
-
-export const LeadModal = ({ open, onOpenChange, context = "general", onLeadCaptured }: LeadModalProps) => {
+// ─── Main Modal ──────────────────────────────────────────────
+export const LeadModal = ({ open, onOpenChange, context = "general", onLeadCaptured, searchFilters }: LeadModalProps) => {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -321,11 +213,17 @@ export const LeadModal = ({ open, onOpenChange, context = "general", onLeadCaptu
   const [submitted, setSubmitted] = useState(false);
   const [emailError, setEmailError] = useState("");
   const [showRedirectTransition, setShowRedirectTransition] = useState(false);
-  const loftyUrlRef = useRef<string>("https://lianetespinosaojeda.expportal.com/listing");
+  const loftyUrlRef = useRef<string>(`${LOFTY_BASE}/listing`);
 
   useEffect(() => {
-    setProfileType(contextToProfile[context] || "");
-  }, [context]);
+    if (open && searchFilters) {
+      if (searchFilters.city) setCity(searchFilters.city);
+      if (searchFilters.beds) setBedrooms(searchFilters.beds);
+      loftyUrlRef.current = buildLoftyURL(searchFilters);
+    }
+  }, [open, searchFilters]);
+
+  useEffect(() => { setProfileType(contextToProfile[context] || ""); }, [context]);
 
   const mutation = useMutation({
     mutationFn: async (data: Record<string, unknown>) => {
@@ -334,7 +232,7 @@ export const LeadModal = ({ open, onOpenChange, context = "general", onLeadCaptu
     },
     onSuccess: () => {
       onLeadCaptured?.();
-      if (context === "busqueda" || context === "general") {
+      if (context === "busqueda") {
         setShowRedirectTransition(true);
       } else {
         setSubmitted(true);
@@ -351,203 +249,133 @@ export const LeadModal = ({ open, onOpenChange, context = "general", onLeadCaptu
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const err = validateEmail(email);
-    if (err) {
-      setEmailError(err);
-      return;
-    }
+    if (err) { setEmailError(err); return; }
     setEmailError("");
 
-    loftyUrlRef.current = buildLoftyURL({
-      city: city || undefined,
-      maxPrice: budget ? parseBudgetToNumber(budget) : undefined,
-      beds: bedrooms ? bedrooms.replace("+", "") : undefined,
-    });
-    console.log("Lofty URL guardada:", loftyUrlRef.current);
+    const finalFilters: SearchFilters = {
+      city: searchFilters?.city || city || undefined,
+      maxPrice: searchFilters?.maxPrice || (budget ? parsePriceToNumber(budget) : undefined),
+      beds: searchFilters?.beds || (bedrooms ? bedrooms.replace("+", "") : undefined),
+    };
+
+    loftyUrlRef.current = buildLoftyURL(finalFilters);
 
     mutation.mutate({
       fullName,
       email,
       phone: phone || null,
-      source: context === "general" ? "lead_modal" : `lead_modal_${context}`,
-      city: city || null,
-      budget: budget || null,
-      bedrooms: bedrooms || null,
+      source: context === "busqueda" ? "busqueda-idx" : context === "general" ? "lead_modal" : `lead_modal_${context}`,
+      city: finalFilters.city || null,
+      budget: budget || (searchFilters?.maxPrice ? `$${Number(searchFilters.maxPrice).toLocaleString()}` : null),
+      bedrooms: finalFilters.beds || null,
       pool: pool ? "si" : "no",
       profileType: profileType || null,
       propertyAddress: propertyAddress || null,
-      message: message || null,
+      message: context === "busqueda"
+        ? `Búsqueda IDX: ${finalFilters.city || "Florida"}, Max $${finalFilters.maxPrice ? Number(finalFilters.maxPrice).toLocaleString() : "Sin límite"}, ${finalFilters.beds || "Cualquier"}+ hab`
+        : message || null,
     });
   };
 
   const reset = () => {
-    setFullName("");
-    setEmail("");
-    setPhone("");
-    setCity("");
-    setBudget("");
-    setBedrooms("");
-    setPool(false);
-    setProfileType(contextToProfile[context] || "");
-    setPropertyAddress("");
-    setMessage("");
-    setSubmitted(false);
-    setEmailError("");
-    setShowRedirectTransition(false);
+    setFullName(""); setEmail(""); setPhone(""); setCity(""); setBudget(""); setBedrooms("");
+    setPool(false); setProfileType(contextToProfile[context] || ""); setPropertyAddress("");
+    setMessage(""); setSubmitted(false); setEmailError(""); setShowRedirectTransition(false);
+    loftyUrlRef.current = `${LOFTY_BASE}/listing`;
     mutation.reset();
   };
 
-  const handleClose = (val: boolean) => {
-    onOpenChange(val);
-    if (!val) setTimeout(reset, 300);
-  };
+  const handleClose = (val: boolean) => { onOpenChange(val); if (!val) setTimeout(reset, 300); };
 
   const info = contextTitles[context] || contextTitles.general;
+  const isSearch = context === "busqueda";
+  const displayCity = searchFilters?.city || city;
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-lg bg-[#F8F6F2] border border-[#BDB2A4]/20 p-0 overflow-hidden shadow-lg rounded-2xl max-h-[90vh] overflow-y-auto">
         {!showRedirectTransition && (
           <div className="bg-[#17140F] p-6 text-[#F8F6F2] text-center sticky top-0 z-10">
-            <DialogTitle className="text-2xl font-serif font-bold text-white">
-              {info.title}
-            </DialogTitle>
-            <DialogDescription className="text-white/70 mt-2">
-              {info.desc}
-            </DialogDescription>
+            <DialogTitle className="text-2xl font-serif font-bold text-white">{info.title}</DialogTitle>
+            <DialogDescription className="text-white/70 mt-2">{info.desc}</DialogDescription>
           </div>
         )}
-
-        {showRedirectTransition && (
-          <DialogTitle className="sr-only">Buscando propiedades</DialogTitle>
-        )}
+        {showRedirectTransition && <DialogTitle className="sr-only">Buscando propiedades</DialogTitle>}
 
         <div className="p-6 md:p-8">
           {showRedirectTransition ? (
-            <RedirectTransition city={city} loftyUrl={loftyUrlRef.current} />
+            <RedirectTransition city={displayCity || ""} loftyUrl={loftyUrlRef.current} />
           ) : submitted ? (
             <div className="text-center space-y-4 py-6">
-              <div className="w-16 h-16 bg-[#D2B463]/20 rounded-full flex items-center justify-center mx-auto text-[#D2B463]">
-                <CheckCircle2 className="w-8 h-8" />
-              </div>
-              <h3 className="text-xl font-serif font-bold text-[#17140F]" data-testid="text-lead-success">¡Perfecto!</h3>
+              <div className="w-16 h-16 bg-[#D2B463]/20 rounded-full flex items-center justify-center mx-auto text-[#D2B463]"><CheckCircle2 className="w-8 h-8" /></div>
+              <h3 className="text-xl font-serif font-bold text-[#17140F]">¡Perfecto!</h3>
               <p className="text-[#17140F]/70">En breve un experto se pondrá en contacto contigo.</p>
-              <Button
-                data-testid="button-lead-close"
-                onClick={() => handleClose(false)}
-                className="mt-4 bg-[#D2B463] hover:bg-[#D2B463]/90 text-[#17140F] font-bold py-4 px-8 rounded-full shadow-sm transition-all duration-300"
-              >
-                Cerrar
-              </Button>
+              <Button onClick={() => handleClose(false)} className="mt-4 bg-[#D2B463] hover:bg-[#D2B463]/90 text-[#17140F] font-bold py-4 px-8 rounded-full">Cerrar</Button>
             </div>
           ) : (
             <form className="space-y-5" onSubmit={handleSubmit}>
+              {isSearch && searchFilters && (searchFilters.city || searchFilters.maxPrice || searchFilters.beds) && (
+                <div className="bg-[#17140F]/5 border border-[#BDB2A4]/20 rounded-xl p-4 text-sm text-[#17140F]">
+                  <p className="font-medium mb-1">Tu búsqueda:</p>
+                  <p className="text-muted-foreground">
+                    {searchFilters.city || "Florida"}
+                    {searchFilters.maxPrice && ` · Hasta $${Number(searchFilters.maxPrice).toLocaleString()}`}
+                    {searchFilters.beds && ` · ${searchFilters.beds}+ habitaciones`}
+                  </p>
+                </div>
+              )}
+
               <div className="space-y-2">
                 <label className="text-sm font-medium text-[#17140F]">Nombre completo <span className="text-red-400">*</span></label>
-                <input
-                  data-testid="input-lead-name"
-                  type="text"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  className={inputClass}
-                  placeholder="Tu nombre completo"
-                  required
-                />
+                <input data-testid="input-lead-name" type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} className={inputClass} placeholder="Tu nombre completo" required />
               </div>
-
               <div className="space-y-2">
                 <label className="text-sm font-medium text-[#17140F]">Correo electrónico <span className="text-red-400">*</span></label>
-                <input
-                  data-testid="input-lead-email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => { setEmail(e.target.value); setEmailError(""); }}
-                  className={`${inputClass} ${emailError ? "border-red-400" : ""}`}
-                  placeholder="correo@ejemplo.com"
-                  required
-                />
+                <input data-testid="input-lead-email" type="email" value={email} onChange={(e) => { setEmail(e.target.value); setEmailError(""); }} className={`${inputClass} ${emailError ? "border-red-400" : ""}`} placeholder="correo@ejemplo.com" required />
                 {emailError && <p className="text-red-400 text-xs">{emailError}</p>}
               </div>
-
               <div className="space-y-2">
                 <label className="text-sm font-medium text-[#17140F]">Teléfono <span className="text-[#BDB2A4] text-xs">(opcional)</span></label>
-                <input
-                  data-testid="input-lead-phone"
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className={inputClass}
-                  placeholder="+1 (555) 000-0000"
-                />
+                <input data-testid="input-lead-phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className={inputClass} placeholder="+1 (555) 000-0000" />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-[#17140F]">Ciudad de interés</label>
-                  <select
-                    data-testid="select-lead-city"
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                    className={inputClass}
-                  >
-                    <option value="">Seleccionar</option>
-                    {cities.map((c) => <option key={c} value={c}>{c}</option>)}
-                  </select>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-[#17140F]">Presupuesto máx.</label>
-                  <select
-                    data-testid="select-lead-budget"
-                    value={budget}
-                    onChange={(e) => setBudget(e.target.value)}
-                    className={inputClass}
-                  >
-                    <option value="">Seleccionar</option>
-                    {budgets.map((b) => <option key={b} value={b}>{b}</option>)}
-                  </select>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-[#17140F]">Habitaciones</label>
-                  <select
-                    data-testid="select-lead-bedrooms"
-                    value={bedrooms}
-                    onChange={(e) => setBedrooms(e.target.value)}
-                    className={inputClass}
-                  >
-                    <option value="">Seleccionar</option>
-                    {bedroomOptions.map((b) => <option key={b} value={b}>{b}</option>)}
-                  </select>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between bg-white p-4 rounded-xl border border-[#BDB2A4]/20">
-                <Label htmlFor="pool-switch" className="text-sm font-medium text-[#17140F] cursor-pointer">¿Desea piscina?</Label>
-                <Switch
-                  id="pool-switch"
-                  data-testid="switch-lead-pool"
-                  checked={pool}
-                  onCheckedChange={setPool}
-                />
-              </div>
+              {!isSearch && (
+                <>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-[#17140F]">Ciudad</label>
+                      <select data-testid="select-lead-city" value={city} onChange={(e) => setCity(e.target.value)} className={inputClass}>
+                        <option value="">Seleccionar</option>
+                        {cities.map((c) => <option key={c} value={c}>{c}</option>)}
+                      </select>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-[#17140F]">Presupuesto</label>
+                      <select data-testid="select-lead-budget" value={budget} onChange={(e) => setBudget(e.target.value)} className={inputClass}>
+                        <option value="">Seleccionar</option>
+                        {budgets.map((b) => <option key={b} value={b}>{b}</option>)}
+                      </select>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-[#17140F]">Habitaciones</label>
+                      <select data-testid="select-lead-bedrooms" value={bedrooms} onChange={(e) => setBedrooms(e.target.value)} className={inputClass}>
+                        <option value="">Seleccionar</option>
+                        {bedroomOptions.map((b) => <option key={b} value={b}>{b}</option>)}
+                      </select>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between bg-white p-4 rounded-xl border border-[#BDB2A4]/20">
+                    <Label htmlFor="pool-switch" className="text-sm font-medium text-[#17140F] cursor-pointer">¿Desea piscina?</Label>
+                    <Switch id="pool-switch" checked={pool} onCheckedChange={setPool} />
+                  </div>
+                </>
+              )}
 
               <div className="space-y-3">
                 <label className="text-sm font-medium text-[#17140F]">Tipo de perfil</label>
-                <RadioGroup
-                  value={profileType}
-                  onValueChange={setProfileType}
-                  className="grid grid-cols-2 gap-3"
-                >
-                  {[
-                    { value: "comprador", label: "Comprador" },
-                    { value: "vendedor", label: "Vendedor" },
-                    { value: "inversionista", label: "Inversionista" },
-                    { value: "realtor", label: "Realtor" },
-                  ].map((opt) => (
-                    <div
-                      key={opt.value}
-                      className="flex items-center space-x-2 border border-[#BDB2A4]/20 p-3 rounded-lg hover:bg-[#E5E1D8]/50 cursor-pointer transition-colors has-[:checked]:border-[#D2B463] has-[:checked]:bg-[#D2B463]/5"
-                    >
+                <RadioGroup value={profileType} onValueChange={setProfileType} className="grid grid-cols-2 gap-3">
+                  {[{ value: "comprador", label: "Comprador" }, { value: "vendedor", label: "Vendedor" }, { value: "inversionista", label: "Inversionista" }, { value: "realtor", label: "Realtor" }].map((opt) => (
+                    <div key={opt.value} className="flex items-center space-x-2 border border-[#BDB2A4]/20 p-3 rounded-lg hover:bg-[#E5E1D8]/50 cursor-pointer transition-colors has-[:checked]:border-[#D2B463] has-[:checked]:bg-[#D2B463]/5">
                       <RadioGroupItem value={opt.value} id={`profile-${opt.value}`} className="text-[#D2B463]" />
                       <Label htmlFor={`profile-${opt.value}`} className="flex-1 cursor-pointer font-normal text-sm">{opt.label}</Label>
                     </div>
@@ -558,43 +386,23 @@ export const LeadModal = ({ open, onOpenChange, context = "general", onLeadCaptu
               {(profileType === "vendedor" || context === "vendedor") && (
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-[#17140F]">Dirección de la propiedad</label>
-                  <input
-                    data-testid="input-lead-property-address"
-                    type="text"
-                    value={propertyAddress}
-                    onChange={(e) => setPropertyAddress(e.target.value)}
-                    className={inputClass}
-                    placeholder="123 Main St, Miami, FL 33101"
-                  />
+                  <input type="text" value={propertyAddress} onChange={(e) => setPropertyAddress(e.target.value)} className={inputClass} placeholder="123 Main St, Miami, FL 33101" />
                 </div>
               )}
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-[#17140F]">Mensaje adicional <span className="text-[#BDB2A4] text-xs">(opcional, máx. 500 caracteres)</span></label>
-                <Textarea
-                  data-testid="textarea-lead-message"
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value.slice(0, 500))}
-                  className="bg-white border border-[#BDB2A4]/20 rounded-lg outline-none focus:border-[#D2B463] transition-all duration-300 shadow-sm resize-none"
-                  placeholder="Cuéntanos más sobre lo que buscas..."
-                  rows={3}
-                  maxLength={500}
-                />
-                <p className="text-xs text-muted-foreground text-right">{message.length}/500</p>
-              </div>
-
-              {mutation.isError && (
-                <p className="text-red-500 text-sm text-center">Hubo un error. Por favor intenta de nuevo.</p>
+              {!isSearch && (
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-[#17140F]">Mensaje <span className="text-[#BDB2A4] text-xs">(opcional)</span></label>
+                  <Textarea value={message} onChange={(e) => setMessage(e.target.value.slice(0, 500))} className="bg-white border border-[#BDB2A4]/20 rounded-lg outline-none focus:border-[#D2B463] shadow-sm resize-none" placeholder="Cuéntanos más..." rows={3} maxLength={500} />
+                </div>
               )}
 
-              <Button
-                data-testid="button-lead-submit"
-                type="submit"
-                disabled={mutation.isPending}
-                className="w-full bg-[#D2B463] hover:bg-[#D2B463]/90 text-[#17140F] font-bold py-6 rounded-full text-lg shadow-lg shadow-[#D2B463]/20 transition-all duration-300"
-              >
-                {mutation.isPending ? <><Loader2 className="w-5 h-5 animate-spin mr-2" /> Enviando...</> : "Enviar y Continuar"}
+              {mutation.isError && <p className="text-red-500 text-sm text-center">Hubo un error. Intenta de nuevo.</p>}
+
+              <Button type="submit" disabled={mutation.isPending} className="w-full bg-[#D2B463] hover:bg-[#D2B463]/90 text-[#17140F] font-bold py-6 rounded-full text-lg shadow-lg shadow-[#D2B463]/20">
+                {mutation.isPending ? <><Loader2 className="w-5 h-5 animate-spin mr-2" /> Enviando...</> : isSearch ? "Ver Propiedades" : "Enviar y Continuar"}
               </Button>
+              {isSearch && <p className="text-center text-xs text-muted-foreground">Al continuar, accederás a los listados del portal</p>}
             </form>
           )}
         </div>

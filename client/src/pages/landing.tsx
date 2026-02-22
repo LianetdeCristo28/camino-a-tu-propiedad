@@ -43,8 +43,8 @@ export default function LandingPage() {
     }
   };
 
-  const scrollToCompradores = () => {
-    const element = document.getElementById('compradores');
+  const scrollTo = (id: string) => {
+    const element = document.getElementById(id);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
     }
@@ -52,7 +52,7 @@ export default function LandingPage() {
 
   return (
     <>
-      <Navbar />
+      <Navbar onContactClick={() => openLeadModal("general")} />
       <main className="min-h-screen bg-background text-foreground font-sans overflow-x-hidden pt-16">
 
         {/* 1. HERO */}
@@ -111,7 +111,7 @@ export default function LandingPage() {
                 <Button
                   data-testid="button-por-donde-empezar"
                   variant="outline"
-                  onClick={scrollToCompradores}
+                  onClick={() => scrollTo('compradores')}
                   className="text-foreground border-[#BDB2A4] text-lg px-8 py-7 rounded-full hover:bg-[#E5E1D8]"
                 >
                   ¿Por dónde empezar?

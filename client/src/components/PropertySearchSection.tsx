@@ -1,11 +1,18 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Search } from "lucide-react";
+import { Search, ArrowUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LeadModal } from "@/components/LeadModal";
 
-const cities = ["Miami", "Orlando", "Tampa", "Jacksonville", "Fort Lauderdale", "Otra"];
-const prices = ["$200K", "$300K", "$400K", "$500K", "$750K", "$1M+"];
+const cities = ["Miami", "Orlando", "Tampa", "Jacksonville", "Fort Lauderdale", "Kissimmee", "Daytona Beach", "Naples"];
+const prices = [
+  { label: "$200K", value: "200000" },
+  { label: "$300K", value: "300000" },
+  { label: "$400K", value: "400000" },
+  { label: "$500K", value: "500000" },
+  { label: "$750K", value: "750000" },
+  { label: "$1M+", value: "1000000" },
+];
 const bedrooms = ["1", "2", "3", "4", "5+"];
 
 export const PropertySearchSection = () => {
@@ -69,7 +76,7 @@ export const PropertySearchSection = () => {
               >
                 <option value="">Seleccionar precio</option>
                 {prices.map((p) => (
-                  <option key={p} value={p}>{p}</option>
+                  <option key={p.value} value={p.value}>{p.label}</option>
                 ))}
               </select>
             </div>
@@ -99,12 +106,32 @@ export const PropertySearchSection = () => {
           </Button>
         </motion.div>
 
-        <p className="text-center text-xs text-muted-foreground italic mt-6">
-          Conectado a base de datos MLS activa
-        </p>
+        <div className="text-center mt-6 space-y-2">
+          <a
+            href="https://lianetespinosaojeda.expportal.com/listing"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground underline hover:text-[#D2B463] transition-colors"
+          >
+            O explora todas las propiedades directamente
+            <ArrowUpRight className="w-3.5 h-3.5" />
+          </a>
+          <p className="text-xs text-muted-foreground italic">
+            Conectado a Stellar MLS · Datos actualizados en tiempo real
+          </p>
+        </div>
       </div>
 
-      <LeadModal open={leadOpen} onOpenChange={setLeadOpen} context="busqueda" />
+      <LeadModal
+        open={leadOpen}
+        onOpenChange={setLeadOpen}
+        context="busqueda"
+        searchFilters={{
+          city: city || undefined,
+          maxPrice: maxPrice || undefined,
+          beds: beds ? beds.replace("+", "") : undefined,
+        }}
+      />
     </section>
   );
 };
