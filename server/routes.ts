@@ -1,5 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import { promises as dns } from "dns";
 import sanitizeHtml from "sanitize-html";
 import { storage } from "./storage";
 import { insertLeadSchema } from "@shared/schema";
@@ -15,6 +16,51 @@ function sanitizeText(value: unknown): string | undefined | null {
   if (value === null || value === undefined) return value;
   if (typeof value !== "string") return value as any;
   return sanitizeHtml(value.trim(), sanitizeOptions);
+}
+
+const DISPOSABLE_DOMAINS = new Set([
+  "mailinator.com",
+  "tempmail.com",
+  "throwaway.email",
+  "guerrillamail.com",
+  "guerrillamail.net",
+  "sharklasers.com",
+  "grr.la",
+  "guerrillamailblock.com",
+  "yopmail.com",
+  "trashmail.com",
+  "trashmail.net",
+  "dispostable.com",
+  "maildrop.cc",
+  "fakeinbox.com",
+  "tempail.com",
+  "temp-mail.org",
+  "10minutemail.com",
+  "mohmal.com",
+  "getnada.com",
+  "emailondeck.com",
+  "mintemail.com",
+]);
+
+async function validateEmailDomain(email: string): Promise<{ valid: boolean; reason?: string }> {
+  const domain = email.split("@")[1]?.toLowerCase();
+  if (!domain) {
+    return { valid: false, reason: "Formato de email inválido" };
+  }
+
+  if (DISPOSABLE_DOMAINS.has(domain)) {
+    return { valid: false, reason: "No se permiten correos temporales. Usa tu email personal o profesional." };
+  }
+
+  try {
+    const records = await dns.resolveMx(domain);
+    if (!records || records.length === 0) {
+      return { valid: false, reason: "El dominio del email no acepta correos. Verifica tu dirección." };
+    }
+    return { valid: true };
+  } catch {
+    return { valid: false, reason: "El dominio del email no es válido. Verifica tu dirección." };
+  }
 }
 
 export async function registerRoutes(
@@ -82,6 +128,18 @@ export async function registerRoutes(
       };
 
       const validated = insertLeadSchema.parse(sanitizedBody);
+
+      const emailCheck = await validateEmailDomain(validated.email);
+      if (!emailCheck.valid) {
+        return res.status(400).json({ message: emailCheck.reason });
+      }
+
+      const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      const recentLead = await storage.getLeadByEmailSince(validated.email, twentyFourHoursAgo);
+      if (recentLead) {
+        return res.json({ success: true, lead: recentLead, duplicate: true });
+      }
+
       const lead = await storage.insertLead(validated);
       res.json({ success: true, lead });
     } catch (error) {

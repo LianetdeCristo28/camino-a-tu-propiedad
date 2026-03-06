@@ -1,7 +1,7 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import pg from "pg";
 import { parse as parseConnectionString } from "pg-connection-string";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, and, gte } from "drizzle-orm";
 import { type User, type InsertUser, type Lead, type InsertLead, users, leads } from "@shared/schema";
 
 const supabaseUrl = process.env.SUPABASE_DATABASE_URL;
@@ -49,6 +49,7 @@ export interface IStorage {
   updateUserPassword(id: string, hashedPassword: string): Promise<void>;
   insertLead(lead: InsertLead): Promise<Lead>;
   getLeads(): Promise<Lead[]>;
+  getLeadByEmailSince(email: string, since: Date): Promise<Lead | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -78,6 +79,15 @@ export class DatabaseStorage implements IStorage {
 
   async getLeads(): Promise<Lead[]> {
     return db.select().from(leads).orderBy(desc(leads.createdAt));
+  }
+
+  async getLeadByEmailSince(email: string, since: Date): Promise<Lead | undefined> {
+    const [lead] = await db
+      .select()
+      .from(leads)
+      .where(and(eq(leads.email, email), gte(leads.createdAt, since.toISOString())))
+      .limit(1);
+    return lead;
   }
 }
 

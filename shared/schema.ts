@@ -40,7 +40,7 @@ export const insertLeadSchema = createInsertSchema(leads)
   })
   .extend({
     fullName: z.string().min(1).max(100).regex(/^[\p{L}\p{M}\s'.,-]+$/u, "Nombre contiene caracteres no válidos"),
-    email: z.string().email("Formato de email inválido").max(254),
+    email: z.string().email("Formato de email inválido").max(254).toLowerCase().trim(),
     phone: z.string().max(20).regex(/^[0-9+\-()\s]*$/, "Teléfono contiene caracteres no válidos").nullish(),
     city: z.string().max(100).nullish(),
     budget: z.string().max(50).nullish(),
