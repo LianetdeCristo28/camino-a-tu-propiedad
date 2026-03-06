@@ -26,21 +26,29 @@ const httpServer = createServer(app);
 
 app.set("trust proxy", 1);
 
+const isDev = process.env.NODE_ENV !== "production";
+
+const cspDirectives: Record<string, string[]> = {
+  "default-src": ["'self'"],
+  "script-src": isDev
+    ? ["'self'", "'unsafe-inline'", "'unsafe-eval'"]
+    : ["'self'", "'unsafe-inline'"],
+  "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+  "font-src": ["'self'", "https://fonts.gstatic.com"],
+  "img-src": ["'self'", "data:", "https:"],
+  "connect-src": isDev
+    ? ["'self'", "https://lianetespinosaojeda.expportal.com", "ws:", "wss:"]
+    : ["'self'", "https://lianetespinosaojeda.expportal.com"],
+  "frame-ancestors": ["'none'"],
+  "base-uri": ["'self'"],
+  "form-action": ["'self'"],
+  "object-src": ["'none'"],
+};
+
 app.use(
   helmet({
     contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'"],
-        styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-        fontSrc: ["'self'", "https://fonts.gstatic.com"],
-        imgSrc: ["'self'", "data:", "blob:"],
-        connectSrc: ["'self'", "https://lianetespinosaojeda.expportal.com", "wss:"],
-        frameSrc: ["'self'", "https://lianetespinosaojeda.expportal.com"],
-        objectSrc: ["'none'"],
-        baseUri: ["'self'"],
-        formAction: ["'self'"],
-      },
+      directives: cspDirectives,
     },
     strictTransportSecurity: {
       maxAge: 31536000,
