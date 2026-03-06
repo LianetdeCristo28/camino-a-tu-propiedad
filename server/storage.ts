@@ -1,7 +1,6 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import pg from "pg";
-import fs from "fs";
-import path from "path";
+import { parse as parseConnectionString } from "pg-connection-string";
 import { eq, desc } from "drizzle-orm";
 import { type User, type InsertUser, type Lead, type InsertLead, users, leads } from "@shared/schema";
 
@@ -15,10 +14,15 @@ if (!supabaseUrl && !fallbackUrl) {
 let pool: pg.Pool;
 
 if (supabaseUrl) {
-  const baseUrl = supabaseUrl.split('?')[0];
-  console.log(`[DB] Conectando a Supabase via connectionString (sslmode=require, no CA override)`);
+  const config = parseConnectionString(supabaseUrl);
+  console.log(`[DB] Conectando a Supabase: ${config.host}:${config.port} user=${config.user} db=${config.database}`);
   pool = new pg.Pool({
-    connectionString: baseUrl + '?sslmode=require',
+    host: config.host ?? undefined,
+    port: config.port ? parseInt(String(config.port), 10) : undefined,
+    user: config.user ?? undefined,
+    password: config.password ?? undefined,
+    database: config.database ?? undefined,
+    ssl: { rejectUnauthorized: false },
     connectionTimeoutMillis: 10000,
   });
 } else {
