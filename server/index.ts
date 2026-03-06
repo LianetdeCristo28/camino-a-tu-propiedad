@@ -154,25 +154,28 @@ export function log(message: string, source = "express") {
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
-  let capturedJsonResponse: Record<string, any> | undefined = undefined;
-
-  const originalResJson = res.json;
-  res.json = function (bodyJson, ...args) {
-    capturedJsonResponse = bodyJson;
-    return originalResJson.apply(res, [bodyJson, ...args]);
-  };
+  const isProduction = process.env.NODE_ENV === "production";
 
   res.on("finish", () => {
-    const duration = Date.now() - start;
-    if (path.startsWith("/api")) {
-      let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
-      const sensitiveRoutes = ["/api/leads", "/api/auth/login"];
-      if (capturedJsonResponse && !sensitiveRoutes.some((r) => path.startsWith(r))) {
-        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
-      }
+    if (!path.startsWith("/api")) return;
 
-      log(logLine);
+    const duration = Date.now() - start;
+    const status = res.statusCode;
+
+    if (isProduction) {
+      if (status >= 400) {
+        log(`${req.method} ${path} ${status} in ${duration}ms`);
+      }
+      return;
     }
+
+    let logLine = `${req.method} ${path} ${status} in ${duration}ms`;
+
+    if (path === "/api/leads" && req.method === "POST") {
+      logLine += status < 400 ? " :: Lead created successfully" : " :: Lead creation failed";
+    }
+
+    log(logLine);
   });
 
   next();
