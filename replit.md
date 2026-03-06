@@ -42,6 +42,11 @@ Preferred communication style: Simple, everyday language.
   - `POST /api/leads`: 5 requests per IP per 15 min
   - `POST /api/auth/login`: 5 attempts per IP per 15 min
   - Standard `RateLimit-*` headers in responses; Spanish error message on limit exceeded
+- **Security Headers**: helmet + custom middleware
+  - Content-Security-Policy with allowlisted Google Fonts, Lofty portal
+  - Strict-Transport-Security, X-Frame-Options: DENY, X-Content-Type-Options: nosniff
+  - Permissions-Policy: camera=(), microphone=(), geolocation=()
+  - Referrer-Policy: strict-origin-when-cross-origin, X-XSS-Protection: 0
 - **CSRF Protection**: csrf-csrf (double-submit cookie pattern)
   - `GET /api/csrf-token` — Returns a CSRF token; sets `__csrf` httpOnly cookie
   - All POST/PUT/DELETE requests to `/api/` require `x-csrf-token` header matching cookie

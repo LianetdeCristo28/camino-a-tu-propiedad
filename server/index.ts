@@ -1,6 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import session from "express-session";
 import rateLimit from "express-rate-limit";
+import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import { doubleCsrf } from "csrf-csrf";
 import { registerRoutes } from "./routes";
@@ -24,6 +25,39 @@ const app = express();
 const httpServer = createServer(app);
 
 app.set("trust proxy", 1);
+
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'"],
+        styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+        fontSrc: ["'self'", "https://fonts.gstatic.com"],
+        imgSrc: ["'self'", "data:", "blob:"],
+        connectSrc: ["'self'", "https://lianetespinosaojeda.expportal.com", "wss:"],
+        frameSrc: ["'self'", "https://lianetespinosaojeda.expportal.com"],
+        objectSrc: ["'none'"],
+        baseUri: ["'self'"],
+        formAction: ["'self'"],
+      },
+    },
+    strictTransportSecurity: {
+      maxAge: 31536000,
+      includeSubDomains: true,
+    },
+    xContentTypeOptions: true,
+    xFrameOptions: { action: "deny" },
+    xXssProtection: false,
+    referrerPolicy: { policy: "strict-origin-when-cross-origin" },
+  }),
+);
+
+app.use((_req, res, next) => {
+  res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+  res.setHeader("X-XSS-Protection", "0");
+  next();
+});
 
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
