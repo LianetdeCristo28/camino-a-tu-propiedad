@@ -15,7 +15,7 @@ let pool: pg.Pool;
 
 if (supabaseUrl) {
   const config = parseConnectionString(supabaseUrl);
-  console.log(`[DB] Conectando a Supabase: ${config.host}:${config.port} user=${config.user} db=${config.database}`);
+  console.log(`[DB] Conectando a Supabase: ${config.host}:${config.port}`);
   pool = new pg.Pool({
     host: config.host ?? undefined,
     port: config.port ? parseInt(String(config.port), 10) : undefined,

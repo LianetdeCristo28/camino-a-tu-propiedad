@@ -38,14 +38,15 @@ Preferred communication style: Simple, everyday language.
 - **Production**: Client is built to `dist/public/`, server is bundled with esbuild to `dist/index.cjs`
 
 ### Data Storage
-- **Database**: PostgreSQL via `node-postgres` (`pg` package)
+- **Database**: Supabase PostgreSQL via Connection Pooler (Transaction mode, port 5432)
 - **ORM**: Drizzle ORM with PostgreSQL dialect
+- **Connection**: Uses `SUPABASE_DATABASE_URL` secret (Replit Secrets, NOT in code/config files). Falls back to `DATABASE_URL` if Supabase URL not set.
+- **URL parsing**: Uses `pg-connection-string` to parse the URL, then passes individual params to `pg.Pool` with `ssl: { rejectUnauthorized: false }` (required for Supabase pooler compatibility)
 - **Schema** (in `shared/schema.ts`):
   - `users` table: `id` (UUID, auto-generated), `username` (unique), `password`
   - `leads` table: `id` (UUID), `name`, `phone`, `email`, `interest`, `source` (defaults to "contact_form"), `diagnosticStep` (optional integer), `createdAt`
 - **Validation**: Drizzle-Zod generates insert schemas; Zod schemas are shared between client and server
 - **Migrations**: Managed via `drizzle-kit push` (schema push approach, not migration files)
-- **Connection**: Uses `DATABASE_URL` environment variable
 
 ### Key Design Patterns
 - **Shared schema**: The `shared/` directory contains the database schema and Zod validation types, used by both client and server
@@ -68,16 +69,17 @@ The landing page (`client/src/pages/landing.tsx`) is composed of these major sec
 ## External Dependencies
 
 ### Database
-- **PostgreSQL** — Primary database, connected via `DATABASE_URL` environment variable. Required for the application to run.
+- **Supabase PostgreSQL** — Primary database, connected via `SUPABASE_DATABASE_URL` Replit Secret (Connection Pooler URL). Falls back to `DATABASE_URL` if not set.
 
 ### Webhook Integration
 - **n8n Webhook** — Optional. If `N8N_WEBHOOK_URL` environment variable is set, new leads are POSTed to this URL for automation workflows (e.g., email notifications, CRM sync). Failure is non-blocking (logged but doesn't affect lead creation).
 
 ### Environment Variables
-| Variable | Required | Purpose |
-|----------|----------|---------|
-| `DATABASE_URL` | Yes | PostgreSQL connection string |
-| `N8N_WEBHOOK_URL` | No | n8n webhook endpoint for lead notifications |
+| Variable | Required | Storage | Purpose |
+|----------|----------|---------|---------|
+| `SUPABASE_DATABASE_URL` | Yes | Replit Secret | Supabase Connection Pooler URL (postgresql://...) |
+| `DATABASE_URL` | Fallback | Replit Secret | PostgreSQL connection string (used if SUPABASE_DATABASE_URL not set) |
+| `N8N_WEBHOOK_URL` | No | Env var | n8n webhook endpoint for lead notifications |
 
 ### Key NPM Dependencies
 - **Frontend**: React, Wouter, TanStack React Query, Framer Motion, shadcn/ui (Radix UI), Tailwind CSS v4
