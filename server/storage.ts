@@ -1,5 +1,7 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import pg from "pg";
+import fs from "fs";
+import path from "path";
 import { eq, desc } from "drizzle-orm";
 import { type User, type InsertUser, type Lead, type InsertLead, users, leads } from "@shared/schema";
 
@@ -13,20 +15,10 @@ if (!supabaseUrl && !fallbackUrl) {
 let pool: pg.Pool;
 
 if (supabaseUrl) {
-  const match = supabaseUrl.match(/^postgresql?:\/\/([^:]+):(.+)@([^@:]+):(\d+)\/(.+?)(\?.*)?$/);
-  if (!match) {
-    console.error("[DB] URL no coincide con el formato esperado. URL (sin password):", supabaseUrl.replace(/:([^@:\/]+)@/, ':***@'));
-    throw new Error("Formato inválido de SUPABASE_DATABASE_URL. Esperado: postgresql://user:password@host:port/database");
-  }
-  const [, user, password, host, port, database] = match;
-  console.log(`[DB] Conectando a Supabase: ${host}:${port} user=${user}`);
+  const baseUrl = supabaseUrl.split('?')[0];
+  console.log(`[DB] Conectando a Supabase via connectionString (sslmode=require, no CA override)`);
   pool = new pg.Pool({
-    user: decodeURIComponent(user),
-    password: decodeURIComponent(password),
-    host,
-    port: parseInt(port, 10),
-    database,
-    ssl: { rejectUnauthorized: false },
+    connectionString: baseUrl + '?sslmode=require',
     connectionTimeoutMillis: 10000,
   });
 } else {
