@@ -23,24 +23,32 @@ if (supabaseUrl) {
     password: config.password ?? undefined,
     database: config.database ?? undefined,
     ssl: { rejectUnauthorized: false },
-    connectionTimeoutMillis: 10000,
+    max: 10,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 5000,
   });
 } else {
   pool = new pg.Pool({
     connectionString: fallbackUrl,
-    connectionTimeoutMillis: 10000,
+    max: 10,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 5000,
   });
 }
 
-pool.on('error', (err) => {
-  console.error('[DB] Error en pool:', err.message);
+pool.on("error", (err) => {
+  console.error("[DB] Error inesperado en el pool de conexiones:", err.message);
 });
 
-pool.query('SELECT 1')
-  .then(() => console.log('[DB] Conexión exitosa'))
-  .catch((err) => console.error('[DB] Error de conexión:', err.message));
+pool.query("SELECT 1")
+  .then(() => console.log("[DB] Conexión exitosa"))
+  .catch((err) => console.error("[DB] Error de conexión:", err.message));
+
+export { pool };
 
 const db = drizzle(pool);
+
+export { db };
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
