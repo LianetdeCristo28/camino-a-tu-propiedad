@@ -13,20 +13,36 @@ if (!supabaseUrl && !fallbackUrl) {
 let pool: pg.Pool;
 
 if (supabaseUrl) {
-  const parsed = new URL(supabaseUrl);
+  const match = supabaseUrl.match(/^postgresql?:\/\/([^:]+):(.+)@([^@:]+):(\d+)\/(.+?)(\?.*)?$/);
+  if (!match) {
+    console.error("[DB] URL no coincide con el formato esperado. URL (sin password):", supabaseUrl.replace(/:([^@:\/]+)@/, ':***@'));
+    throw new Error("Formato inválido de SUPABASE_DATABASE_URL. Esperado: postgresql://user:password@host:port/database");
+  }
+  const [, user, password, host, port, database] = match;
+  console.log(`[DB] Conectando a Supabase: ${host}:${port} user=${user}`);
   pool = new pg.Pool({
-    user: decodeURIComponent(parsed.username),
-    password: decodeURIComponent(parsed.password),
-    host: parsed.hostname,
-    port: parseInt(parsed.port, 10),
-    database: parsed.pathname.slice(1),
+    user: decodeURIComponent(user),
+    password: decodeURIComponent(password),
+    host,
+    port: parseInt(port, 10),
+    database,
     ssl: { rejectUnauthorized: false },
+    connectionTimeoutMillis: 10000,
   });
 } else {
   pool = new pg.Pool({
     connectionString: fallbackUrl,
+    connectionTimeoutMillis: 10000,
   });
 }
+
+pool.on('error', (err) => {
+  console.error('[DB] Error en pool:', err.message);
+});
+
+pool.query('SELECT 1')
+  .then(() => console.log('[DB] Conexión exitosa'))
+  .catch((err) => console.error('[DB] Error de conexión:', err.message));
 
 const db = drizzle(pool);
 
