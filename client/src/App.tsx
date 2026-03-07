@@ -5,7 +5,6 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { CookieConsent } from "@/components/CookieConsent";
 import LandingPage from "@/pages/landing";
-import AdminPage from "@/pages/admin";
 import PrivacidadPage from "@/pages/privacidad";
 import NotFound from "@/pages/not-found";
 
@@ -18,7 +17,6 @@ function Router() {
       <Route path="/inversionistas" component={LandingPage} />
       <Route path="/blog" component={NotFound} />
       <Route path="/privacidad" component={PrivacidadPage} />
-      <Route path="/admin" component={AdminPage} />
       <Route component={NotFound} />
     </Switch>
   );

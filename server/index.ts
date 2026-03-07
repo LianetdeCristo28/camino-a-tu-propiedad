@@ -1,5 +1,4 @@
 import express, { type Request, Response, NextFunction } from "express";
-import session from "express-session";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 import cors from "cors";
@@ -9,13 +8,6 @@ import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
 import { config } from "./config";
-
-declare module "express-session" {
-  interface SessionData {
-    userId: string;
-    username: string;
-  }
-}
 
 declare module "http" {
   interface IncomingMessage {
@@ -111,17 +103,9 @@ const leadLimiter = rateLimit({
   message: { message: "Demasiadas solicitudes. Por favor espera unos minutos." },
 });
 
-const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 5,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { message: "Demasiadas solicitudes. Por favor espera unos minutos." },
-});
-
 app.use("/api/", apiLimiter);
 
-export { leadLimiter, loginLimiter };
+export { leadLimiter };
 
 app.use(
   express.json({
@@ -133,20 +117,6 @@ app.use(
 
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-
-app.use(
-  session({
-    secret: config.sessionSecret,
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      httpOnly: true,
-      secure: config.isProduction,
-      sameSite: "strict",
-      maxAge: 2 * 60 * 60 * 1000,
-    },
-  }),
-);
 
 const { doubleCsrfProtection, generateCsrfToken } = doubleCsrf({
   getSecret: () => config.sessionSecret,
@@ -218,9 +188,6 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  const { ensureAdminUser } = await import("./auth");
-  await ensureAdminUser();
-
   await registerRoutes(httpServer, app);
 
   app.use((err: any, _req: Request, res: Response, next: NextFunction) => {
@@ -241,7 +208,7 @@ app.use((req, res, next) => {
     return res.status(status).json({ message: err.message });
   });
 
-  if (config.isProduction) {
+  if (process.env.NODE_ENV === "production") {
     serveStatic(app);
   } else {
     const { setupVite } = await import("./vite");

@@ -31,16 +31,9 @@ Preferred communication style: Simple, everyday language.
 ### Backend Architecture
 - **Runtime**: Node.js with Express 5
 - **Language**: TypeScript, executed via `tsx` in development
-- **Authentication**: express-session with bcrypt password hashing
-  - `POST /api/auth/login` — Authenticate with username/password (bcrypt-verified)
-  - `POST /api/auth/logout` — Destroy session
-  - `GET /api/auth/me` — Check current session status
-  - Session config: httpOnly, secure in production, sameSite strict, 2-hour maxAge
-  - Admin user auto-created on first startup if not present
 - **Rate Limiting**: express-rate-limit with trust proxy
   - Global: 100 requests per IP per 15 min on all `/api/` routes
   - `POST /api/leads`: 5 requests per IP per 15 min
-  - `POST /api/auth/login`: 5 attempts per IP per 15 min
   - Standard `RateLimit-*` headers in responses; Spanish error message on limit exceeded
 - **Security Headers**: helmet + custom middleware
   - Content-Security-Policy with allowlisted Google Fonts, Lofty portal
@@ -52,9 +45,9 @@ Preferred communication style: Simple, everyday language.
   - All POST/PUT/DELETE requests to `/api/` require `x-csrf-token` header matching cookie
   - Frontend `apiRequest()` in `lib/queryClient.ts` auto-fetches and sends CSRF tokens
 - **API Design**: REST API under `/api/` prefix
+  - `GET /api/health` — Health check with DB status
+  - `GET /api/csrf-token` — Returns CSRF token
   - `POST /api/leads` — Create a new lead (validated with Zod, public, rate-limited, CSRF-protected)
-  - `GET /api/leads` — Retrieve all leads (protected by requireAuth middleware)
-  - `GET /api/admin/export-leads` — Download all leads as CSV file (protected by requireAuth middleware)
 - **Development**: Vite dev server is integrated as middleware (in `server/vite.ts`) for HMR during development
 - **Production**: Client is built to `dist/public/`, server is bundled with esbuild to `dist/index.cjs`
 
@@ -64,7 +57,6 @@ Preferred communication style: Simple, everyday language.
 - **Connection**: Uses `SUPABASE_DATABASE_URL` secret (Replit Secrets, NOT in code/config files). Falls back to `DATABASE_URL` if Supabase URL not set.
 - **URL parsing**: Uses `pg-connection-string` to parse the URL, then passes individual params to `pg.Pool` with `ssl: { rejectUnauthorized: false }` (required for Supabase pooler compatibility)
 - **Schema** (in `shared/schema.ts`):
-  - `users` table: `id` (UUID, auto-generated), `username` (unique), `password`
   - `leads` table: `id` (UUID), `fullName`, `email`, `phone`, `city`, `budget`, `bedrooms`, `pool`, `profileType`, `propertyAddress`, `message`, `source`, `consentedAt` (ISO timestamp of privacy consent), `createdAt`
 - **Validation**: Drizzle-Zod generates insert schemas with extended Zod refinements (max lengths, regex patterns); sanitize-html strips all HTML tags server-side before validation
 - **Migrations**: Managed via `drizzle-kit push` (schema push approach, not migration files)
