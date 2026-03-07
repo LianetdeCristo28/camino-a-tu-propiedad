@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { CheckCircle2, Loader2, Shield, Database, Filter, Sparkles, KeyRound, ArrowUpRight } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import { trackEvent } from "@/lib/analytics";
 import { motion } from "framer-motion";
 
 type LeadContext = "comprador" | "vendedor" | "inversionista" | "busqueda" | "general";
@@ -232,6 +233,7 @@ export const LeadModal = ({ open, onOpenChange, context = "general", onLeadCaptu
       return res.json();
     },
     onSuccess: () => {
+      trackEvent("lead_submitted", { source: context || "direct" });
       onLeadCaptured?.();
       if (context === "busqueda") {
         setShowRedirectTransition(true);

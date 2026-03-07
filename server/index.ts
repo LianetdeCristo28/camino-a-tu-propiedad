@@ -59,14 +59,14 @@ app.use(
 const cspDirectives: Record<string, string[]> = {
   "default-src": ["'self'"],
   "script-src": isDev
-    ? ["'self'", "'unsafe-inline'", "'unsafe-eval'"]
-    : ["'self'", "'unsafe-inline'"],
+    ? ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://www.googletagmanager.com", "https://www.google-analytics.com", "https://connect.facebook.net"]
+    : ["'self'", "'unsafe-inline'", "https://www.googletagmanager.com", "https://www.google-analytics.com", "https://connect.facebook.net"],
   "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
   "font-src": ["'self'", "https://fonts.gstatic.com"],
-  "img-src": ["'self'", "data:", "https:"],
+  "img-src": ["'self'", "data:", "https:", "https://www.facebook.com", "https://www.google-analytics.com"],
   "connect-src": isDev
-    ? ["'self'", "https://lianetespinosaojeda.expportal.com", "ws:", "wss:"]
-    : ["'self'", "https://lianetespinosaojeda.expportal.com"],
+    ? ["'self'", "https://lianetespinosaojeda.expportal.com", "https://www.google-analytics.com", "https://analytics.google.com", "https://www.facebook.com", "ws:", "wss:"]
+    : ["'self'", "https://lianetespinosaojeda.expportal.com", "https://www.google-analytics.com", "https://analytics.google.com", "https://www.facebook.com"],
   "frame-ancestors": ["'none'"],
   "base-uri": ["'self'"],
   "form-action": ["'self'"],

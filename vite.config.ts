@@ -6,6 +6,10 @@ import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 import { metaImagesPlugin } from "./vite-plugin-meta-images";
 
 export default defineConfig({
+  define: {
+    __GA4_MEASUREMENT_ID__: JSON.stringify(process.env.GA4_MEASUREMENT_ID || ""),
+    __FB_PIXEL_ID__: JSON.stringify(process.env.FB_PIXEL_ID || ""),
+  },
   plugins: [
     react(),
     runtimeErrorOverlay(),

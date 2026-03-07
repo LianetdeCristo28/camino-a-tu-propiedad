@@ -92,6 +92,17 @@ The landing page (`client/src/pages/landing.tsx`) is composed of these major sec
 8. **ChatbotAna** — Floating chatbot widget (UI shell, not yet connected to AI)
 9. **DiagnosticModal** — Multi-step quiz that captures leads
 10. **LeadCaptureModal** — Direct contact form
+11. **CookieConsent** — GDPR-style cookie consent banner; controls GA4 and Facebook Pixel loading
+
+### Analytics & Tracking
+- **Google Analytics 4**: Loaded dynamically after cookie consent via `client/src/lib/analytics.ts`. Measurement ID injected from `GA4_MEASUREMENT_ID` env var via Vite `define`.
+- **Facebook Pixel**: Loaded dynamically after cookie consent. Pixel ID injected from `FB_PIXEL_ID` env var via Vite `define`.
+- **Cookie Consent**: Banner in `client/src/components/CookieConsent.tsx`. Preference stored in `localStorage` key `cookie_consent`. Scripts only load after user accepts.
+- **Conversion Events** (no PII sent):
+  - `lead_submitted` — fired on successful lead form submission (LeadModal, DiagnosticModal)
+  - `diagnostic_completed` — fired when diagnostic quiz lead is submitted
+  - `property_search_initiated` — fired when user clicks search (PropertySearchSection)
+- **CSP**: GA4 and FB Pixel domains added to `script-src`, `connect-src`, and `img-src` in `server/index.ts`
 
 ## External Dependencies
 

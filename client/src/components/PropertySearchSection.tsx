@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Search, ArrowUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LeadModal } from "@/components/LeadModal";
+import { trackEvent } from "@/lib/analytics";
 
 const cities = ["Miami", "Orlando", "Tampa", "Jacksonville", "Fort Lauderdale", "Kissimmee", "Daytona Beach", "Naples"];
 const prices = [
@@ -22,6 +23,7 @@ export const PropertySearchSection = () => {
   const [leadOpen, setLeadOpen] = useState(false);
 
   const handleSearch = () => {
+    trackEvent("property_search_initiated", { city: city || "any", max_price: maxPrice || "any", beds: beds || "any" });
     setLeadOpen(true);
   };
 

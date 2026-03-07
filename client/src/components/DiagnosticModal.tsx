@@ -7,6 +7,7 @@ import { CheckCircle2, ArrowRight, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import { trackEvent } from "@/lib/analytics";
 
 interface DiagnosticModalProps {
   open: boolean;
@@ -80,6 +81,8 @@ export const DiagnosticModal = ({ open, onOpenChange }: DiagnosticModalProps) =>
       return res.json();
     },
     onSuccess: () => {
+      trackEvent("lead_submitted", { source: "diagnostic" });
+      trackEvent("diagnostic_completed");
       setContactSubmitted(true);
     },
   });
