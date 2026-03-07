@@ -11,7 +11,7 @@ const RealtorsIASection = lazy(() => import("@/components/RealtorsIASection").th
 const PropertySearchSection = lazy(() => import("@/components/PropertySearchSection").then(m => ({ default: m.PropertySearchSection })));
 const ChatbotAna = lazy(() => import("@/components/ChatbotAna").then(m => ({ default: m.ChatbotAna })));
 import { Button } from "@/components/ui/button";
-import { ArrowDown, Check, Search, TrendingDown, Clock, Activity, Calculator, EyeOff, Shield, Handshake } from "lucide-react";
+import { ArrowDown, Check, Search, TrendingDown, Clock, Activity, Calculator, EyeOff, Shield, Handshake, Compass, FileQuestion, AlertTriangle, Hourglass } from "lucide-react";
 import { motion } from "framer-motion";
 
 function AnimatedCounter({ target, duration = 2000 }: { target: number; duration?: number }) {
@@ -248,24 +248,27 @@ export default function LandingPage() {
                 ¿Te suena familiar?
               </h2>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 text-left">
                 {[
-                  { text: "No sabes por dónde empezar y Google te confunde más.", emoji: "🤯", gradient: "from-red-50/50 to-white", span: "md:row-span-2" },
-                  { text: "Te hablan en términos financieros que no entiendes.", emoji: "😵‍💫", gradient: "from-orange-50/50 to-white", span: "" },
-                  { text: "Tienes miedo de cometer un error que te cueste miles.", emoji: "😰", gradient: "from-amber-50/50 to-white", span: "" },
-                  { text: "Sientes que todos tus amigos avanzan menos tú.", emoji: "😔", gradient: "from-rose-50/50 to-white", span: "md:col-span-2" },
+                  { text: "Buscas información y cada fuente te dice algo distinto.", sub: "Sin una guía clara, cada decisión se siente como un riesgo.", icon: Compass },
+                  { text: "El lenguaje financiero te deja fuera de la conversación.", sub: "Tasas, escrow, pre-aprobación... nadie te lo explica en palabras simples.", icon: FileQuestion },
+                  { text: "Un solo error puede costarte miles de dólares.", sub: "Y sin experiencia, no sabes qué cláusulas proteger ni qué preguntar.", icon: AlertTriangle },
+                  { text: "Sientes que el tiempo pasa y no avanzas.", sub: "Otros ya cerraron. Tú sigues esperando sin saber cuál es el próximo paso.", icon: Hourglass },
                 ].map((pain, i) => (
                   <motion.div
                     key={i}
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ delay: i * 0.1 }}
-                    className={`bg-gradient-to-br ${pain.gradient} p-4 sm:p-6 md:p-8 rounded-xl shadow-sm border border-[#BDB2A4]/20 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 ease-out group ${pain.span} ${i === 0 ? "flex flex-col justify-center" : ""}`}
+                    transition={{ delay: i * 0.12 }}
+                    className="bg-white/80 backdrop-blur-sm p-6 md:p-8 rounded-2xl border border-[#BDB2A4]/15 hover:-translate-y-1 hover:shadow-xl hover:border-primary/20 transition-all duration-300 ease-out group"
                     data-testid={`card-pain-${i}`}
                   >
-                    <span className="text-4xl mb-4 block group-hover:animate-pulse">{pain.emoji}</span>
-                    <p className={`font-medium text-[#17140F] ${i === 0 ? "text-xl md:text-2xl" : "text-lg"}`}>{pain.text}</p>
+                    <div className="w-12 h-12 rounded-xl bg-[#17140F] flex items-center justify-center mb-5 group-hover:bg-primary transition-colors duration-300">
+                      <pain.icon className="w-5 h-5 text-[#D2B463] group-hover:text-white transition-colors duration-300" />
+                    </div>
+                    <p className="font-semibold text-[#17140F] text-lg leading-snug mb-2">{pain.text}</p>
+                    <p className="text-sm text-[#6B6257] leading-relaxed">{pain.sub}</p>
                   </motion.div>
                 ))}
               </div>
