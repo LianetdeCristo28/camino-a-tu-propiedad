@@ -389,7 +389,7 @@ const StepDetailContent = ({ step, onNext, onClose, isMobile = false }: { step: 
             {/* Footer Actions */}
             <div className="p-6 pt-4 border-t bg-white mt-auto space-y-3">
                 <Button 
-                    className="w-full bg-primary hover:bg-primary/90 text-[#17140F] font-bold text-md py-6 shadow-sm group justify-between rounded-full transition-all duration-300"
+                    className="w-full bg-primary hover:bg-primary/90 text-[#17140F] font-bold text-md py-5 shadow-sm group justify-between rounded-xl transition-all duration-300"
                 >
                     <span className="flex items-center gap-2">
                         <Sparkles className="w-4 h-4 fill-current" />

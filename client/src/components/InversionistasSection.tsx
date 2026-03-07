@@ -97,7 +97,7 @@ export const InversionistasSection = () => {
             <Button
               data-testid="button-evaluar-inversion"
               onClick={() => setLeadOpen(true)}
-              className="bg-[#D2B463] text-[#17140F] hover:bg-[#D2B463]/90 text-lg px-8 py-7 rounded-full font-bold shadow-lg hover:scale-105 transition-all mt-8 w-full"
+              className="bg-[#D2B463] text-[#17140F] hover:bg-[#D2B463]/90 text-lg px-10 py-5 rounded-xl font-bold shadow-lg hover:scale-105 transition-all mt-8 w-full"
             >
               Evaluar Mi Oportunidad de Inversión
             </Button>

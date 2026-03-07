@@ -91,7 +91,7 @@ export const VendedoresSection = () => {
           <Button
             data-testid="button-solicitar-cma"
             onClick={() => setLeadOpen(true)}
-            className="bg-primary hover:bg-primary/90 text-primary-foreground text-xl px-12 py-8 rounded-full shadow-lg shadow-primary/20 hover:scale-105 transition-all"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground text-lg px-10 py-5 rounded-xl shadow-lg shadow-primary/20 hover:scale-105 transition-all"
           >
             Solicitar Análisis CMA Gratuito
           </Button>
