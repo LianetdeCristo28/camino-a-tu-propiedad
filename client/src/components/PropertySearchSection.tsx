@@ -31,7 +31,7 @@ export const PropertySearchSection = () => {
   const selectClass = "bg-[#F8F6F2] border border-[#BDB2A4]/20 rounded-lg p-4 pl-11 outline-none focus:border-b-2 focus:border-b-primary transition-all duration-300 text-[#17140F] text-sm w-full appearance-none cursor-pointer";
 
   return (
-    <section id="buscar" className="py-24 bg-[#F8F6F2]">
+    <section id="buscar" className="py-12 sm:py-16 md:py-24 bg-[#F8F6F2]">
       <div className="max-w-5xl mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

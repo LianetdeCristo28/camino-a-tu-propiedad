@@ -108,7 +108,7 @@ export default function LandingPage() {
                 Conectado a Stellar MLS · Datos en tiempo real
               </div>
 
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-serif font-bold text-[#17140F] leading-[1.1] text-balance">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-serif font-bold text-[#17140F] leading-[1.1] text-balance">
                 Tu Estrategia Inteligente para el Mercado Inmobiliario de Florida
               </h1>
 
@@ -124,7 +124,7 @@ export default function LandingPage() {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={handleHeroExplorar}
-                  className="inline-flex items-center justify-center bg-primary text-primary-foreground text-lg px-8 py-7 rounded-full shadow-lg shadow-primary/20 hover:scale-105 transition-transform hover:bg-primary/90 font-medium cursor-pointer"
+                  className="w-full sm:w-auto inline-flex items-center justify-center bg-primary text-primary-foreground text-lg px-8 py-7 rounded-full shadow-lg shadow-primary/20 hover:scale-105 transition-transform hover:bg-primary/90 font-medium cursor-pointer"
                 >
                   <Search className="w-5 h-5 mr-2" />
                   Explorar Propiedades
@@ -133,7 +133,7 @@ export default function LandingPage() {
                   data-testid="button-por-donde-empezar"
                   variant="outline"
                   onClick={() => scrollTo('compradores')}
-                  className="text-foreground border-[#BDB2A4] text-lg px-8 py-7 rounded-full hover:bg-[#E5E1D8]"
+                  className="w-full sm:w-auto text-foreground border-[#BDB2A4] text-lg px-8 py-7 rounded-full hover:bg-[#E5E1D8]"
                 >
                   ¿Por dónde empezar?
                 </Button>
@@ -165,7 +165,7 @@ export default function LandingPage() {
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
-              className="hidden md:block relative"
+              className="hidden lg:block relative"
             >
               <div className="relative w-full max-w-md mx-auto">
                 <motion.div
@@ -242,7 +242,7 @@ export default function LandingPage() {
 
         {/* 2. COMPRADORES (engloba: pain points + staircase + soporte + CTA) */}
         <section id="compradores">
-          <div className="pt-24 pb-8 bg-[#F8F6F2]">
+          <div className="pt-12 sm:pt-16 md:pt-24 pb-8 bg-[#F8F6F2]">
             <div className="max-w-4xl mx-auto px-6 text-center">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -261,7 +261,7 @@ export default function LandingPage() {
           </div>
 
           {/* Pain Points */}
-          <div className="py-20 bg-[#E5E1D8]">
+          <div className="py-12 sm:py-16 md:py-20 bg-[#E5E1D8]">
             <div className="max-w-4xl mx-auto px-6 text-center">
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif font-medium mb-16 text-[#17140F]">
                 ¿Te suena familiar?
@@ -280,7 +280,7 @@ export default function LandingPage() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: i * 0.1 }}
-                    className={`bg-gradient-to-br ${pain.gradient} p-8 rounded-xl shadow-sm border border-[#BDB2A4]/20 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 ease-out group ${pain.span} ${i === 0 ? "flex flex-col justify-center" : ""}`}
+                    className={`bg-gradient-to-br ${pain.gradient} p-4 sm:p-6 md:p-8 rounded-xl shadow-sm border border-[#BDB2A4]/20 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 ease-out group ${pain.span} ${i === 0 ? "flex flex-col justify-center" : ""}`}
                     data-testid={`card-pain-${i}`}
                   >
                     <span className="text-4xl mb-4 block group-hover:animate-pulse">{pain.emoji}</span>
@@ -313,7 +313,7 @@ export default function LandingPage() {
           </div>
 
           {/* Staircase */}
-          <div className="py-24 bg-white relative overflow-hidden">
+          <div className="py-12 sm:py-16 md:py-24 bg-white relative overflow-hidden">
             <div className="max-w-7xl mx-auto px-6">
               <div className="text-center max-w-3xl mx-auto mb-16">
                 <span className="text-primary font-bold tracking-[0.15em] uppercase text-sm mb-4 block">El Método</span>
@@ -330,10 +330,10 @@ export default function LandingPage() {
           </div>
 
           {/* Support / Acompañamiento */}
-          <div className="py-24 bg-[#F8F6F2] relative">
+          <div className="py-12 sm:py-16 md:py-24 bg-[#F8F6F2] relative">
             <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
               <div className="space-y-6">
-                <div className="relative h-[500px] rounded-2xl overflow-hidden shadow-2xl">
+                <div className="relative h-[300px] sm:h-[400px] md:h-[500px] rounded-2xl overflow-hidden shadow-2xl">
                   <img src="/assets/key-hand.png" alt="Mano entregando las llaves de una casa nueva" loading="lazy" className="w-full h-full object-cover" />
                   <div className="absolute inset-0 bg-black/20" />
                   <div className="absolute bottom-8 left-8 right-8 text-white">
@@ -439,7 +439,7 @@ export default function LandingPage() {
         </Suspense>
 
         {/* 7. CTA FINAL */}
-        <section className="py-32 bg-[#17140F] text-[#F8F6F2] text-center px-6 relative overflow-hidden">
+        <section className="py-16 sm:py-24 md:py-32 bg-[#17140F] text-[#F8F6F2] text-center px-6 relative overflow-hidden">
           <div className="absolute top-0 left-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl" />
           <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#CBB29B]/10 rounded-full blur-3xl" />
 
@@ -505,7 +505,7 @@ export default function LandingPage() {
         initial={{ y: 100 }}
         animate={{ y: 0 }}
         transition={{ delay: 2 }}
-        className="fixed bottom-6 left-6 right-6 z-40 md:hidden pointer-events-none"
+        className="fixed bottom-20 left-6 right-6 z-40 md:hidden pointer-events-none"
       >
         <Button
           data-testid="button-mobile-cta"

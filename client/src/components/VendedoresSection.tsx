@@ -41,7 +41,7 @@ export const VendedoresSection = () => {
   const [leadOpen, setLeadOpen] = useState(false);
 
   return (
-    <section id="vendedores" className="py-24 bg-gradient-to-b from-[#E5E1D8] to-[#F0EDE7]">
+    <section id="vendedores" className="py-12 sm:py-16 md:py-24 bg-gradient-to-b from-[#E5E1D8] to-[#F0EDE7]">
       <div className="max-w-7xl mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -68,7 +68,7 @@ export const VendedoresSection = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="bg-[#F8F6F2] p-6 rounded-xl border border-[#BDB2A4]/20 shadow-sm hover:-translate-y-1 hover:shadow-lg hover:border-[#D2B463] transition-all duration-300 ease-out group"
+                className="bg-[#F8F6F2] p-4 sm:p-6 rounded-xl border border-[#BDB2A4]/20 shadow-sm hover:-translate-y-1 hover:shadow-lg hover:border-[#D2B463] transition-all duration-300 ease-out group"
                 data-testid={`card-seller-step-${step.num}`}
               >
                 <span className="text-[#D2B463] font-bold text-3xl block mb-3">{step.num}</span>

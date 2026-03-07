@@ -38,7 +38,7 @@ export const RealtorsIASection = () => {
   };
 
   return (
-    <section id="realtors-ia" className="py-24 bg-[#17140F] text-[#F8F6F2]">
+    <section id="realtors-ia" className="py-12 sm:py-16 md:py-24 bg-[#17140F] text-[#F8F6F2]">
       <div className="max-w-7xl mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -65,7 +65,7 @@ export const RealtorsIASection = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="bg-white/10 backdrop-blur-sm p-8 rounded-2xl border border-white/10 hover:ring-2 hover:ring-[#D2B463] transition-all duration-300"
+                className="bg-white/10 backdrop-blur-sm p-4 sm:p-6 md:p-8 rounded-2xl border border-white/10 hover:ring-2 hover:ring-[#D2B463] transition-all duration-300"
                 data-testid={`card-realtor-ia-${i + 1}`}
               >
                 <div className="w-12 h-12 rounded-xl bg-[#D2B463]/10 flex items-center justify-center text-[#D2B463] mb-5">
