@@ -435,6 +435,27 @@ export default function LandingPage() {
           <div className="absolute top-0 left-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl" />
           <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#CBB29B]/10 rounded-full blur-3xl" />
 
+          {[
+            { left: "10%", delay: "0s", duration: "6s" },
+            { left: "25%", delay: "1.2s", duration: "8s" },
+            { left: "40%", delay: "0.5s", duration: "7s" },
+            { left: "55%", delay: "2s", duration: "9s" },
+            { left: "70%", delay: "0.8s", duration: "6.5s" },
+            { left: "85%", delay: "1.5s", duration: "7.5s" },
+            { left: "15%", delay: "3s", duration: "8.5s" },
+          ].map((dot, i) => (
+            <span
+              key={i}
+              className="absolute w-1 h-1 rounded-full bg-[#D2B463]/20 animate-float-up"
+              style={{
+                left: dot.left,
+                bottom: "-4px",
+                animationDelay: dot.delay,
+                animationDuration: dot.duration,
+              }}
+            />
+          ))}
+
           <div className="relative z-10 max-w-3xl mx-auto space-y-10">
             <h2 className="text-4xl md:text-6xl font-serif font-bold leading-tight">
               No adivines el proceso. <br/>
@@ -449,7 +470,11 @@ export default function LandingPage() {
               >
                 Descubre tu próximo paso
               </Button>
-              <p className="text-sm text-white/40 uppercase tracking-widest">Sin compromiso · Gratis · 2 Minutos</p>
+              <div className="flex flex-wrap justify-center gap-6 text-xs text-white/60">
+                <span className="flex items-center gap-1.5">✓ 100% Gratis</span>
+                <span className="flex items-center gap-1.5">✓ Sin compromiso</span>
+                <span className="flex items-center gap-1.5">✓ 2 minutos</span>
+              </div>
             </div>
           </div>
         </section>

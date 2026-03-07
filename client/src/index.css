@@ -78,6 +78,28 @@ html {
       transform: translate3d(0, 0, 0);
     }
   }
+
+  @keyframes floatUp {
+    0% {
+      transform: translateY(0);
+      opacity: 0;
+    }
+    10% {
+      opacity: 1;
+    }
+    90% {
+      opacity: 0.5;
+    }
+    100% {
+      transform: translateY(-500px);
+      opacity: 0;
+    }
+  }
+
+}
+
+.animate-float-up {
+  animation: floatUp 7s ease-in infinite;
 }
 
 @layer base {
