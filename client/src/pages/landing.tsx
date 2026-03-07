@@ -1,4 +1,4 @@
-import React, { useState, useRef, lazy, Suspense } from "react";
+import React, { useState, useRef, useEffect, lazy, Suspense } from "react";
 import { Staircase } from "@/components/Staircase";
 import { DiagnosticModal } from "@/components/DiagnosticModal";
 import { LeadModal } from "@/components/LeadModal";
@@ -11,8 +11,27 @@ const RealtorsIASection = lazy(() => import("@/components/RealtorsIASection").th
 const PropertySearchSection = lazy(() => import("@/components/PropertySearchSection").then(m => ({ default: m.PropertySearchSection })));
 const ChatbotAna = lazy(() => import("@/components/ChatbotAna").then(m => ({ default: m.ChatbotAna })));
 import { Button } from "@/components/ui/button";
-import { ArrowDown, Check } from "lucide-react";
+import { ArrowDown, Check, Search, TrendingDown, Clock, Activity } from "lucide-react";
 import { motion } from "framer-motion";
+
+function AnimatedCounter({ target, duration = 2000 }: { target: number; duration?: number }) {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    let start = 0;
+    const increment = target / (duration / 16);
+    const timer = setInterval(() => {
+      start += increment;
+      if (start >= target) {
+        setCount(target);
+        clearInterval(timer);
+      } else {
+        setCount(Math.floor(start));
+      }
+    }, 16);
+    return () => clearInterval(timer);
+  }, [target, duration]);
+  return <>{count.toLocaleString()}</>;
+}
 
 const LOFTY_BASE_URL = "https://lianetespinosaojeda.expportal.com/listing";
 
@@ -84,8 +103,9 @@ export default function LandingPage() {
               transition={{ duration: 0.8 }}
               className="space-y-8"
             >
-              <div className="inline-block px-4 py-1.5 rounded-full bg-[#E5E1D8] text-[#17140F] text-sm font-medium tracking-wide">
-                Plataforma Inmobiliaria Inteligente
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#E5E1D8] text-[#17140F] text-sm font-medium tracking-wide">
+                <Activity className="w-3.5 h-3.5 text-primary" />
+                Conectado a Stellar MLS · Datos en tiempo real
               </div>
 
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-serif font-bold text-[#17140F] leading-[1.1] text-balance">
@@ -106,6 +126,7 @@ export default function LandingPage() {
                   onClick={handleHeroExplorar}
                   className="inline-flex items-center justify-center bg-primary text-primary-foreground text-lg px-8 py-7 rounded-full shadow-lg shadow-primary/20 hover:scale-105 transition-transform hover:bg-primary/90 font-medium cursor-pointer"
                 >
+                  <Search className="w-5 h-5 mr-2" />
                   Explorar Propiedades
                 </a>
                 <Button
@@ -119,12 +140,97 @@ export default function LandingPage() {
               </div>
 
               <div className="flex items-center gap-4 text-sm text-muted-foreground pt-4">
-                <div className="flex -space-x-2">
-                  {[1,2,3].map(i => (
-                    <div key={i} className="w-8 h-8 rounded-full bg-[#E5E1D8] border-2 border-[#F8F6F2]" />
+                <div className="flex -space-x-3">
+                  {[
+                    { initial: "L", bg: "#D2B463" },
+                    { initial: "M", bg: "#17140F" },
+                    { initial: "C", bg: "#8B7355" },
+                    { initial: "J", bg: "#BDB2A4" },
+                  ].map((person, i) => (
+                    <div
+                      key={i}
+                      className="w-9 h-9 rounded-full border-[3px] border-white flex items-center justify-center text-white text-xs font-bold"
+                      style={{ backgroundColor: person.bg }}
+                      data-testid={`avatar-social-proof-${i}`}
+                    >
+                      {person.initial}
+                    </div>
                   ))}
                 </div>
-                <p>+120 familias ayudadas este año</p>
+                <p>+120 familias encontraron su hogar este año</p>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+              className="hidden md:block relative"
+            >
+              <div className="relative w-full max-w-md mx-auto">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.5 }}
+                  className="bg-white/70 backdrop-blur-xl border border-white/30 rounded-2xl shadow-2xl p-7"
+                  data-testid="card-floating-stats"
+                >
+                  <div className="space-y-4">
+                    <div>
+                      <p className="text-4xl font-serif font-bold text-[#17140F]">
+                        <AnimatedCounter target={1247} />
+                      </p>
+                      <p className="text-sm text-muted-foreground mt-1">propiedades activas en Florida</p>
+                    </div>
+                    <div className="h-px bg-[#BDB2A4]/20" />
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-xs text-muted-foreground uppercase tracking-wider">Precio promedio</p>
+                        <p className="text-lg font-bold text-[#17140F]">$385,000</p>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full text-xs font-medium">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                        Actualizado hace 2 min
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.8 }}
+                  className="absolute -bottom-12 -left-8 bg-white/80 backdrop-blur-lg border border-white/30 rounded-xl shadow-2xl p-4 -rotate-2 w-56"
+                  data-testid="card-savings"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center shrink-0">
+                      <TrendingDown className="w-4 h-4 text-emerald-600" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Ahorro promedio negociado</p>
+                      <p className="text-sm font-bold text-[#17140F]">$12,400</p>
+                    </div>
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 1.0 }}
+                  className="absolute -bottom-8 -right-6 bg-white/80 backdrop-blur-lg border border-white/30 rounded-xl shadow-2xl p-4 rotate-3 w-56"
+                  data-testid="card-closing-time"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-amber-50 flex items-center justify-center shrink-0">
+                      <Clock className="w-4 h-4 text-amber-600" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Tiempo promedio de cierre</p>
+                      <p className="text-sm font-bold text-[#17140F]">32 días</p>
+                    </div>
+                  </div>
+                </motion.div>
               </div>
             </motion.div>
           </div>
