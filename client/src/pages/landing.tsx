@@ -139,26 +139,7 @@ export default function LandingPage() {
                 </Button>
               </div>
 
-              <div className="flex items-center gap-4 text-sm text-muted-foreground pt-4">
-                <div className="flex -space-x-3">
-                  {[
-                    { initial: "L", bg: "#D2B463" },
-                    { initial: "M", bg: "#17140F" },
-                    { initial: "C", bg: "#8B7355" },
-                    { initial: "J", bg: "#BDB2A4" },
-                  ].map((person, i) => (
-                    <div
-                      key={i}
-                      className="w-9 h-9 rounded-full border-[3px] border-white flex items-center justify-center text-white text-xs font-bold"
-                      style={{ backgroundColor: person.bg }}
-                      data-testid={`avatar-social-proof-${i}`}
-                    >
-                      {person.initial}
-                    </div>
-                  ))}
-                </div>
-                <p>+120 familias encontraron su hogar este año</p>
-              </div>
+
             </motion.div>
 
             <motion.div
