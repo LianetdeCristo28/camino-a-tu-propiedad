@@ -279,8 +279,8 @@ export default function LandingPage() {
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ delay: i * 0.12 }}
-                    className={`bg-gradient-to-br ${pain.gradient} p-8 rounded-xl shadow-sm border border-[#BDB2A4]/20 hover:shadow-lg transition-all duration-300 group ${pain.span} ${i === 0 ? "flex flex-col justify-center" : ""}`}
+                    transition={{ delay: i * 0.1 }}
+                    className={`bg-gradient-to-br ${pain.gradient} p-8 rounded-xl shadow-sm border border-[#BDB2A4]/20 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 ease-out group ${pain.span} ${i === 0 ? "flex flex-col justify-center" : ""}`}
                     data-testid={`card-pain-${i}`}
                   >
                     <span className="text-4xl mb-4 block group-hover:animate-pulse">{pain.emoji}</span>
@@ -374,8 +374,8 @@ export default function LandingPage() {
                       initial={{ opacity: 0, x: 20 }}
                       whileInView={{ opacity: 1, x: 0 }}
                       viewport={{ once: true }}
-                      transition={{ delay: i * 0.15 }}
-                      className="flex items-center gap-4 p-4 rounded-xl bg-[#F8F6F2] hover:shadow-md transition-shadow duration-300"
+                      transition={{ delay: i * 0.1 }}
+                      className="flex items-center gap-4 p-4 rounded-xl bg-[#F8F6F2] hover:-translate-y-1 hover:shadow-lg transition-all duration-300 ease-out"
                       data-testid={`card-benefit-${i}`}
                     >
                       <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">

@@ -63,8 +63,8 @@ export const InversionistasSection = () => {
                   initial={{ opacity: 0, x: -20 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: i * 0.08 }}
-                  className="bg-white p-5 rounded-xl border border-[#BDB2A4]/20 hover:shadow-md transition-all duration-300"
+                  transition={{ delay: i * 0.1 }}
+                  className="bg-white p-5 rounded-xl border border-[#BDB2A4]/20 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 ease-out"
                   data-testid={`card-investor-metric-${i + 1}`}
                 >
                   <div className="flex items-center gap-3 mb-2">

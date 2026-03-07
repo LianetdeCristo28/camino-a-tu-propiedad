@@ -6,10 +6,15 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export const Navbar = ({ onContactClick }: { onContactClick?: () => void }) => {
   const [scrolled, setScrolled] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50);
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      setScrollProgress(docHeight > 0 ? (window.scrollY / docHeight) * 100 : 0);
+    };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -18,7 +23,8 @@ export const Navbar = ({ onContactClick }: { onContactClick?: () => void }) => {
     setMobileOpen(false);
     const element = document.getElementById(id);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+      const top = element.getBoundingClientRect().top + window.scrollY - 80;
+      window.scrollTo({ top, behavior: 'smooth' });
     }
   };
 
@@ -31,6 +37,11 @@ export const Navbar = ({ onContactClick }: { onContactClick?: () => void }) => {
   ];
 
   return (
+    <>
+    <div
+      className="fixed top-0 left-0 h-[2px] bg-[#D2B463] z-[60] transition-all duration-150"
+      style={{ width: `${scrollProgress}%` }}
+    />
     <nav role="navigation" aria-label="Navegación principal" className={cn(
       "sticky top-0 z-50 w-full transition-all duration-300 px-6 py-4",
       scrolled
@@ -115,5 +126,6 @@ export const Navbar = ({ onContactClick }: { onContactClick?: () => void }) => {
         )}
       </AnimatePresence>
     </nav>
+    </>
   );
 };

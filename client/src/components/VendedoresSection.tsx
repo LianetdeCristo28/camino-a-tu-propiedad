@@ -64,11 +64,11 @@ export const VendedoresSection = () => {
             return (
               <motion.div
                 key={step.num}
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="bg-[#F8F6F2] p-6 rounded-xl border border-[#BDB2A4]/20 shadow-sm hover:-translate-y-2 hover:shadow-lg hover:border-[#D2B463] transition-all duration-300 group"
+                className="bg-[#F8F6F2] p-6 rounded-xl border border-[#BDB2A4]/20 shadow-sm hover:-translate-y-1 hover:shadow-lg hover:border-[#D2B463] transition-all duration-300 ease-out group"
                 data-testid={`card-seller-step-${step.num}`}
               >
                 <span className="text-[#D2B463] font-bold text-3xl block mb-3">{step.num}</span>
