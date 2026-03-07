@@ -54,6 +54,7 @@ Preferred communication style: Simple, everyday language.
 - **API Design**: REST API under `/api/` prefix
   - `POST /api/leads` — Create a new lead (validated with Zod, public, rate-limited, CSRF-protected)
   - `GET /api/leads` — Retrieve all leads (protected by requireAuth middleware)
+  - `GET /api/admin/export-leads` — Download all leads as CSV file (protected by requireAuth middleware)
 - **Development**: Vite dev server is integrated as middleware (in `server/vite.ts`) for HMR during development
 - **Production**: Client is built to `dist/public/`, server is bundled with esbuild to `dist/index.cjs`
 
@@ -67,6 +68,12 @@ Preferred communication style: Simple, everyday language.
   - `leads` table: `id` (UUID), `name`, `phone`, `email`, `interest`, `source` (defaults to "contact_form"), `diagnosticStep` (optional integer), `createdAt`
 - **Validation**: Drizzle-Zod generates insert schemas with extended Zod refinements (max lengths, regex patterns); sanitize-html strips all HTML tags server-side before validation
 - **Migrations**: Managed via `drizzle-kit push` (schema push approach, not migration files)
+
+### Backup Strategy
+- **Supabase Backups**: Automatic daily backups via Supabase dashboard (Plan Pro)
+- **JSON Backup Script**: `npx tsx server/scripts/backup.ts` exports all leads to `backups/` directory; retains last 30 files
+- **CSV Export**: `GET /api/admin/export-leads` (auth required) downloads leads as CSV with BOM for Excel compatibility
+- **Recovery Plan**: Documented in `RECOVERY.md`
 
 ### Key Design Patterns
 - **Shared schema**: The `shared/` directory contains the database schema and Zod validation types, used by both client and server

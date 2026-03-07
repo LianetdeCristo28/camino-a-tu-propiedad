@@ -158,5 +158,69 @@ export async function registerRoutes(
     }
   });
 
+  app.get("/api/admin/export-leads", requireAuth, async (_req, res) => {
+    try {
+      const leads = await storage.getLeads();
+
+      const csvHeaders = [
+        "ID",
+        "Nombre",
+        "Email",
+        "Teléfono",
+        "Ciudad",
+        "Presupuesto",
+        "Habitaciones",
+        "Piscina",
+        "Tipo de Perfil",
+        "Dirección Propiedad",
+        "Mensaje",
+        "Fuente",
+        "Fecha de Creación",
+      ];
+
+      const escapeField = (val: string | null | undefined): string => {
+        if (val === null || val === undefined) return "";
+        const str = String(val);
+        if (str.includes(",") || str.includes('"') || str.includes("\n")) {
+          return `"${str.replace(/"/g, '""')}"`;
+        }
+        return str;
+      };
+
+      const rows = leads.map((lead) =>
+        [
+          lead.id,
+          lead.fullName,
+          lead.email,
+          lead.phone,
+          lead.city,
+          lead.budget,
+          lead.bedrooms,
+          lead.pool,
+          lead.profileType,
+          lead.propertyAddress,
+          lead.message,
+          lead.source,
+          lead.createdAt,
+        ]
+          .map(escapeField)
+          .join(","),
+      );
+
+      const csv = [csvHeaders.join(","), ...rows].join("\n");
+      const timestamp = new Date().toISOString().split("T")[0];
+
+      res.setHeader("Content-Type", "text/csv; charset=utf-8");
+      res.setHeader(
+        "Content-Disposition",
+        `attachment; filename="leads_${timestamp}.csv"`,
+      );
+      return res.send("\uFEFF" + csv);
+    } catch (error) {
+      console.error("Error exporting leads:", error);
+      return res.status(500).json({ message: "Error al exportar los datos" });
+    }
+  });
+
   return httpServer;
 }
