@@ -36,7 +36,7 @@ const FAQ_OPTIONS: FaqItem[] = [
   {
     label: "📞 Hablar con Lianet",
     answer:
-      "Puedes comunicarte directamente con Lianet Espinosa al (786) 447-6525 o escribir un mensaje a través del formulario de contacto en esta página. ¡Estamos para ayudarte!",
+      "Puedes comunicarte directamente con Lianet Espinosa al (407) 371-2374 o escribir un mensaje a través del formulario de contacto en esta página. ¡Estamos para ayudarte!",
   },
 ];
 
@@ -160,10 +160,10 @@ export const ChatbotAna = () => {
                 Ana es una asistente automatizada con respuestas predefinidas.
                 Para temas urgentes, llámanos al{" "}
                 <a
-                  href="tel:+17864476525"
+                  href="tel:+14073712374"
                   className="text-primary font-medium hover:underline"
                 >
-                  (786) 447-6525
+                  (407) 371-2374
                 </a>
               </p>
               <div className="flex gap-2">
@@ -176,7 +176,7 @@ export const ChatbotAna = () => {
                 </button>
                 <a
                   data-testid="link-chatbot-call"
-                  href="tel:+17864476525"
+                  href="tel:+14073712374"
                   className="flex items-center gap-1.5 text-xs bg-primary text-[#17140F] rounded-full px-4 py-2 hover:bg-primary/90 transition-colors font-medium"
                 >
                   <Phone className="w-3.5 h-3.5" />
