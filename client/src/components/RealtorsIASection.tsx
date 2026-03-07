@@ -87,7 +87,7 @@ export const RealtorsIASection = () => {
           <Button
             data-testid="button-agendar-consultoria"
             onClick={scheduleConsultancy}
-            className="bg-[#17140F] text-white hover:bg-[#17140F]/90 text-lg px-10 py-5 rounded-xl shadow-lg hover:scale-105 transition-all"
+            className="bg-[#17140F] text-white hover:bg-[#17140F]/90 text-xl px-12 py-8 rounded-full shadow-lg hover:scale-105 transition-all"
           >
             Agendar Consultoría de IA
           </Button>

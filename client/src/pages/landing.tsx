@@ -11,7 +11,7 @@ const RealtorsIASection = lazy(() => import("@/components/RealtorsIASection").th
 const PropertySearchSection = lazy(() => import("@/components/PropertySearchSection").then(m => ({ default: m.PropertySearchSection })));
 const ChatbotAna = lazy(() => import("@/components/ChatbotAna").then(m => ({ default: m.ChatbotAna })));
 import { Button } from "@/components/ui/button";
-import { ArrowDown, ArrowRight, Check, Search, TrendingDown, Clock, Activity, Calculator, EyeOff, Shield, Handshake } from "lucide-react";
+import { ArrowDown, Check, Search, TrendingDown, Clock, Activity, Calculator, EyeOff, Shield, Handshake } from "lucide-react";
 import { motion } from "framer-motion";
 
 function AnimatedCounter({ target, duration = 2000 }: { target: number; duration?: number }) {
@@ -124,7 +124,7 @@ export default function LandingPage() {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={handleHeroExplorar}
-                  className="inline-flex items-center justify-center bg-primary text-primary-foreground text-lg px-8 py-5 rounded-xl shadow-lg shadow-primary/20 hover:scale-105 transition-transform hover:bg-primary/90 font-medium cursor-pointer"
+                  className="inline-flex items-center justify-center bg-primary text-primary-foreground text-lg px-8 py-7 rounded-full shadow-lg shadow-primary/20 hover:scale-105 transition-transform hover:bg-primary/90 font-medium cursor-pointer"
                 >
                   <Search className="w-5 h-5 mr-2" />
                   Explorar Propiedades
@@ -133,7 +133,7 @@ export default function LandingPage() {
                   data-testid="button-por-donde-empezar"
                   variant="outline"
                   onClick={() => scrollTo('compradores')}
-                  className="text-foreground border-[#BDB2A4] text-lg px-8 py-5 rounded-xl hover:bg-[#E5E1D8]"
+                  className="text-foreground border-[#BDB2A4] text-lg px-8 py-7 rounded-full hover:bg-[#E5E1D8]"
                 >
                   ¿Por dónde empezar?
                 </Button>
@@ -409,15 +409,11 @@ export default function LandingPage() {
                 <Button
                   data-testid="button-comenzar-proceso"
                   onClick={() => openLeadModal("comprador")}
-                  className="group bg-primary hover:bg-primary/90 text-primary-foreground text-lg px-10 py-5 rounded-xl shadow-lg shadow-primary/20 hover:scale-105 transition-all"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground text-xl px-12 py-8 rounded-full shadow-lg shadow-primary/20 hover:scale-105 transition-all"
                 >
                   Comenzar Mi Proceso
-                  <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
-                <div className="flex items-center gap-6 justify-center text-xs text-muted-foreground mt-4">
-                  <span className="flex items-center gap-1.5"><Shield className="w-3.5 h-3.5" />100% gratuito</span>
-                  <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" />Respuesta en &lt;24h</span>
-                </div>
+                <p className="text-sm text-muted-foreground mt-4">Sin compromiso · Respuesta en menos de 24 horas</p>
               </motion.div>
             </div>
           </div>
@@ -458,10 +454,9 @@ export default function LandingPage() {
               <Button
                 data-testid="button-descubre-paso"
                 onClick={() => setDiagnosticOpen(true)}
-                className="group bg-primary hover:bg-primary/90 text-primary-foreground text-lg px-10 py-5 rounded-xl shadow-lg shadow-primary/20 hover:scale-105 transition-all w-full md:w-auto"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground text-xl px-12 py-8 rounded-full shadow-lg shadow-primary/20 hover:scale-105 transition-all w-full md:w-auto"
               >
                 Descubre tu próximo paso
-                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
               <p className="text-sm text-white/40 uppercase tracking-widest">Sin compromiso · Gratis · 2 Minutos</p>
             </div>
