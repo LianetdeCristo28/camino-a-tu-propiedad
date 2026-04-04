@@ -35,6 +35,7 @@ export default function AdminPage() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [leadsLoading, setLeadsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
 
   useEffect(() => {
     fetch("/api/auth/me")
@@ -48,6 +49,24 @@ export default function AdminPage() {
       })
       .finally(() => setLoading(false));
   }, []);
+
+  async function handleExportCSV() {
+    try {
+      const res = await fetch("/api/admin/export-leads");
+      if (!res.ok) throw new Error();
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `leads_${new Date().toISOString().split("T")[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch {
+      alert("Error al exportar los leads. Intenta de nuevo.");
+    }
+  }
 
   async function fetchLeads() {
     setLeadsLoading(true);
@@ -217,13 +236,23 @@ export default function AdminPage() {
 
       <main className="max-w-7xl mx-auto p-6">
         <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 flex-wrap">
             <div className="bg-white rounded-xl px-5 py-3 shadow-sm border border-[#E5E1D8]">
               <span className="text-sm text-[#BDB2A4]">Total leads</span>
               <p className="text-2xl font-bold text-[#17140F]" data-testid="text-total-leads">
                 {leads.length}
               </p>
             </div>
+            {["comprador", "vendedor", "inversionista", "realtor"].map((type) => {
+              const count = leads.filter((l) => l.profileType === type).length;
+              if (count === 0) return null;
+              return (
+                <div key={type} className="bg-white rounded-xl px-4 py-3 shadow-sm border border-[#E5E1D8]">
+                  <span className="text-xs text-[#BDB2A4] capitalize">{type}</span>
+                  <p className="text-xl font-bold text-[#17140F]">{count}</p>
+                </div>
+              );
+            })}
           </div>
           <div className="flex items-center gap-3">
             <input
@@ -234,6 +263,13 @@ export default function AdminPage() {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="px-4 py-2 border border-[#E5E1D8] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D2B463] bg-white"
             />
+            <button
+              data-testid="button-export-csv"
+              onClick={handleExportCSV}
+              className="px-4 py-2 bg-[#17140F] text-white rounded-lg hover:bg-[#BDB2A4] transition-colors"
+            >
+              Exportar CSV
+            </button>
             <button
               data-testid="button-refresh-leads"
               onClick={fetchLeads}
@@ -288,8 +324,9 @@ export default function AdminPage() {
                   {filteredLeads.map((lead) => (
                     <tr
                       key={lead.id}
-                      className="border-b border-[#E5E1D8] hover:bg-[#F8F6F2] transition-colors"
+                      className="border-b border-[#E5E1D8] hover:bg-[#F8F6F2] transition-colors cursor-pointer"
                       data-testid={`row-lead-${lead.id}`}
+                      onClick={() => setSelectedLead(lead)}
                     >
                       <td className="px-4 py-3 text-sm font-medium text-[#17140F]">
                         {lead.fullName}
@@ -332,6 +369,60 @@ export default function AdminPage() {
           </div>
         )}
       </main>
+
+      {selectedLead && (
+        <div
+          className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4"
+          onClick={() => setSelectedLead(null)}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="bg-[#17140F] p-5 rounded-t-2xl flex items-center justify-between">
+              <h2 className="text-white font-bold text-lg" style={{ fontFamily: "Playfair Display, serif" }}>
+                {selectedLead.fullName}
+              </h2>
+              <button
+                onClick={() => setSelectedLead(null)}
+                className="text-white/60 hover:text-white text-xl leading-none"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              {[
+                { label: "Email", value: selectedLead.email },
+                { label: "Teléfono", value: selectedLead.phone },
+                { label: "Ciudad", value: selectedLead.city },
+                { label: "Presupuesto", value: selectedLead.budget },
+                { label: "Habitaciones", value: selectedLead.bedrooms },
+                { label: "Piscina", value: selectedLead.pool },
+                { label: "Perfil", value: selectedLead.profileType },
+                { label: "Dirección propiedad", value: selectedLead.propertyAddress },
+                { label: "Fuente", value: selectedLead.source },
+                { label: "Mensaje", value: selectedLead.message },
+                {
+                  label: "Fecha",
+                  value: selectedLead.createdAt
+                    ? new Date(selectedLead.createdAt).toLocaleDateString("es-ES", {
+                        day: "2-digit", month: "long", year: "numeric",
+                        hour: "2-digit", minute: "2-digit",
+                      })
+                    : null,
+                },
+              ].map(({ label, value }) =>
+                value ? (
+                  <div key={label} className="flex flex-col gap-0.5 border-b border-[#F0EDE8] pb-3 last:border-0">
+                    <span className="text-xs font-semibold text-[#BDB2A4] uppercase tracking-wider">{label}</span>
+                    <span className="text-sm text-[#17140F]">{value}</span>
+                  </div>
+                ) : null
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

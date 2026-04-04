@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
 import { Bot, Settings, Database, UserCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
 
 const cards = [
   {
@@ -26,16 +25,11 @@ const cards = [
   },
 ];
 
-export const RealtorsIASection = () => {
-  const { toast } = useToast();
+interface RealtorsIASectionProps {
+  onScheduleConsultancy?: () => void;
+}
 
-  const scheduleConsultancy = () => {
-    console.log("scheduleConsultancy: usuario solicitó consultoría de IA");
-    toast({
-      title: "Próximamente",
-      description: "Agenda tu consultoría de IA. Esta función estará disponible muy pronto.",
-    });
-  };
+export const RealtorsIASection = ({ onScheduleConsultancy }: RealtorsIASectionProps) => {
 
   return (
     <section id="realtors-ia" className="py-12 sm:py-16 md:py-24 bg-[#17140F] text-[#F8F6F2]">
@@ -86,7 +80,7 @@ export const RealtorsIASection = () => {
         >
           <Button
             data-testid="button-agendar-consultoria"
-            onClick={scheduleConsultancy}
+            onClick={onScheduleConsultancy}
             className="bg-[#D2B463] text-[#17140F] hover:bg-[#D2B463]/90 text-xl px-12 py-8 rounded-full shadow-lg hover:scale-105 transition-all"
           >
             Agendar Consultoría de IA
