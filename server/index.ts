@@ -44,7 +44,8 @@ app.use(
         productionOrigins.includes(origin) ||
         origin.endsWith(".replit.app") ||
         origin.endsWith(".replit.dev") ||
-        origin.endsWith(".repl.co")
+        origin.endsWith(".repl.co") ||
+        origin.endsWith(".railway.app")
       ) {
         return callback(null, true);
       }
